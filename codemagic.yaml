@@ -8,7 +8,7 @@ workflows:
     environment:
       vars:
         BUNDLE_ID: "com.elitedriverazurriviera.app"
-        XCODE_WORKSPACE: "App/App.xcworkspace"
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
       node: 18
       xcode: latest
