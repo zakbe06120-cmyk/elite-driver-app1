@@ -1,0 +1,10 @@
+{
+  "appId": "com.elitedriverazurriviera.app",
+  "appName": "Elite Driver Azur Riviera",
+  "webDir": "www",
+  "backgroundColor": "#FAF9F5",
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#FAF9F5"
+  }
+}

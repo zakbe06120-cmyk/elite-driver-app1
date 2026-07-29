@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elite Driver Azur Riviera — App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sand:#F0EEE4;
+    --paper:#FAF9F5;
+    --azure:#6A9BCC;
+    --azure-2:#8AB1D8;
+    --azure-deep:#4B7FB0;
+    --gold:#D97757;
+    --gold-soft:#E8A088;
+    --coral:#788C5D;
+    --pine:#788C5D;
+    --ink:#141413;
+    --slate:#83827D;
+    --line: rgba(20,20,19,0.1);
+    --radius: 20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: #0d1b22;
+    font-family:'Lora', serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:24px 12px;
+  }
+  .device{
+    width:390px;
+    max-width:100%;
+    height:844px;
+    max-height:92vh;
+    background: var(--sand);
+    border-radius:52px;
+    border: 10px solid #111;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.06);
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .notch{
+    position:absolute;
+    top:10px; left:50%; transform:translateX(-50%);
+    width:120px; height:26px;
+    background:#111;
+    border-radius:20px;
+    z-index:50;
+  }
+  .statusbar{
+    height:46px;
+    flex-shrink:0;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    padding:0 26px 8px;
+    color: var(--ink);
+    font-size:13px;
+    font-weight:600;
+  }
+  .stripe-band{
+    height:7px;
+    flex-shrink:0;
+    background: repeating-linear-gradient(115deg, var(--azure) 0 14px, var(--gold-soft) 14px 18px, var(--paper) 18px 32px);
+    opacity:0.9;
+  }
+  .app-header{
+    padding: 12px 22px 14px;
+    flex-shrink:0;
+    position:relative;
+    background: var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .brand-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .brand{
+    font-family:'Poppins', sans-serif;
+    font-size:15.5px;
+    letter-spacing:0.1em;
+    color: var(--ink);
+    text-transform:uppercase;
+    flex:1;
+    min-width:0;
+  }
+  .brand span{ color:var(--gold); }
+  .header-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .badge-24{
+    font-size:10px;
+    color:var(--paper);
+    background: linear-gradient(135deg,var(--azure),var(--azure-deep));
+    padding:4px 9px;
+    border-radius:20px;
+    font-weight:700;
+    letter-spacing:0.05em;
+    white-space:nowrap;
+  }
+  .lang-switch{
+    display:flex;
+    border:1px solid var(--line);
+    border-radius:20px;
+    overflow:hidden;
+    flex-shrink:0;
+    background:var(--sand);
+  }
+  .lang-btn{
+    border:none;
+    background:transparent;
+    color:var(--slate);
+    font-size:10.5px;
+    font-weight:700;
+    padding:5px 9px;
+    cursor:pointer;
+    font-family:'Lora', serif;
+    letter-spacing:0.03em;
+  }
+  .lang-btn.active{ background:var(--gold); color:var(--paper); }
+  .screen-title{
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:27px;
+    color:var(--ink);
+    margin:14px 0 2px;
+  }
+  .screen-sub{
+    color:var(--slate);
+    font-size:13px;
+    line-height:1.5;
+  }
+  .content{
+    flex:1;
+    overflow-y:auto;
+    padding: 0 22px 100px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .content::-webkit-scrollbar{width:0;}
+  .screen{ display:none; animation: fade .35s ease; }
+  .screen.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .hero{
+    margin-top:14px;
+    border-radius: var(--radius);
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgba(231,207,164,0.35), transparent 55%),
+      linear-gradient(165deg, var(--azure-2), var(--azure-deep) 75%);
+    border:1px solid rgba(255,255,255,0.12);
+    padding:24px 20px 22px;
+    position:relative;
+    overflow:hidden;
+    box-shadow: 0 14px 30px rgba(14,92,126,0.28);
+  }
+  .hero::before{
+    content:'';
+    position:absolute; left:0; right:0; bottom:0; height:34px;
+    background: repeating-linear-gradient(-8deg, transparent 0 10px, rgba(255,255,255,0.08) 10px 12px);
+  }
+  .route-line{
+    position:absolute;
+    right:-24px; top:-18px;
+    width:150px; height:150px;
+    opacity:0.85;
+  }
+  .hero-eyebrow{
+    color:var(--gold-soft);
+    font-size:11px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .hero h1{
+    font-family:'Poppins', sans-serif;
+    font-weight:600;
+    font-size:24px;
+    line-height:1.28;
+    color:#FAF9F5;
+    margin:9px 0 10px;
+    max-width:230px;
+  }
+  .hero p{
+    color:rgba(255,253,248,0.82);
+    font-size:13.5px;
+    line-height:1.5;
+    max-width:250px;
+    margin:0 0 18px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    background: linear-gradient(135deg,var(--gold-soft),var(--gold));
+    color:#141413;
+    font-weight:700;
+    font-size:14px;
+    border:none;
+    padding:13px 18px;
+    border-radius:13px;
+    cursor:pointer;
+    width:100%;
+    transition:transform .15s ease, filter .15s ease;
+    box-shadow: 0 6px 16px rgba(184,146,90,0.35);
+  }
+  .btn:active{ transform:scale(0.97); filter:brightness(0.96); }
+  .btn-ghost{
+    background:transparent;
+    color:var(--azure-deep);
+    border:1.5px solid var(--azure);
+    box-shadow:none;
+  }
+  .strip{ display:flex; gap:10px; margin-top:16px; }
+  .chip{
+    flex:1;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 10px;
+    text-align:center;
+    box-shadow: 0 2px 8px rgba(34,48,58,0.05);
+  }
+  .chip .n{ font-family:'Poppins', sans-serif; color:var(--azure); font-size:16px; display:block; font-weight:600; }
+  .chip .l{ color:var(--slate); font-size:10.5px; margin-top:3px; display:block; }
+  .section-label{
+    display:flex; align-items:center; gap:10px;
+    margin:26px 0 12px;
+    color:var(--azure-deep);
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+  }
+  .section-label::after{ content:''; flex:1; height:1px; background:var(--line); }
+  .service-row{
+    display:flex; gap:12px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px;
+    margin-bottom:10px;
+    align-items:flex-start;
+    cursor:pointer;
+    box-shadow: 0 2px 8px rgba(34,48,58,0.05);
+  }
+  .service-icon{
+    width:42px;height:42px;flex-shrink:0;
+    border-radius:12px;
+    background:linear-gradient(160deg,var(--azure-2),var(--azure-deep));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.14);
+  }
+  .service-row h3{ margin:0 0 4px; color:var(--ink); font-size:14.5px; font-weight:600;}
+  .service-row p{ margin:0; color:var(--slate); font-size:12.5px; line-height:1.45;}
+  .quote-card{
+    background: linear-gradient(180deg, var(--paper), var(--sand));
+    border:1px solid var(--line);
+    border-left:3px solid var(--gold);
+    border-radius:16px;
+    padding:16px 16px 14px; margin-top:8px;
+  }
+  .quote-card p{ color:var(--ink); font-size:13.5px; font-style:italic; line-height:1.5; margin:0 0 10px; font-family:'Poppins', sans-serif;}
+  .quote-card .who{ color:var(--azure); font-size:12px; font-weight:600; font-family:'Lora', serif;}
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block; color:var(--slate); font-size:11.5px;
+    text-transform:uppercase; letter-spacing:0.06em;
+    margin-bottom:6px; font-weight:600;
+  }
+  .field input, .field textarea, .field select{
+    width:100%;
+    background:var(--paper);
+    border:1px solid var(--line);
+    color:var(--ink);
+    border-radius:12px;
+    padding:12px 13px;
+    font-size:14px;
+    font-family:'Lora', serif;
+    outline:none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--azure); }
+  .field textarea{ resize:none; height:70px; }
+  .row2{ display:flex; gap:10px; }
+  .row2 .field{ flex:1; }
+  .segmented{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
+  .seg-btn{
+    border:1px solid var(--line); background:var(--paper); color:var(--slate);
+    border-radius:12px; padding:11px 8px; font-size:11.5px; font-weight:600;
+    text-align:center; cursor:pointer; line-height:1.3;
+  }
+  .seg-btn.active{ background:linear-gradient(135deg,rgba(14,92,126,0.1),rgba(184,146,90,0.14)); border-color:var(--azure); color:var(--azure-deep); }
+  .stepper-dots{ display:flex; gap:6px; margin: 4px 0 18px; }
+  .stepper-dots span{ height:3px; flex:1; border-radius:3px; background:var(--line); }
+  .stepper-dots span.done{ background:var(--gold); }
+  .pay-summary{
+    background:var(--paper); border:1px solid var(--line); border-radius:16px;
+    padding:16px; margin:6px 0 16px; box-shadow: 0 2px 8px rgba(20,20,19,0.05);
+  }
+  .pay-summary-row{ display:flex; justify-content:space-between; align-items:center; font-size:13px; color:var(--slate); font-weight:600; }
+  .pay-amount{ font-family:'Poppins',sans-serif; color:var(--gold); font-size:22px; font-weight:700; }
+  .pay-summary-note{ margin:8px 0 0; color:var(--slate); font-size:11.5px; line-height:1.4; }
+  .apple-pay-btn{
+    width:100%; background:#000; color:#fff; border:none; border-radius:12px;
+    padding:13px 18px; font-size:15px; font-weight:600; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:7px;
+    font-family:'Poppins',sans-serif;
+  }
+  .apple-pay-btn:active{ transform:scale(0.97); }
+  .pay-divider{
+    display:flex; align-items:center; gap:10px; margin:18px 0 14px;
+    color:var(--slate); font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .pay-divider::before, .pay-divider::after{ content:''; flex:1; height:1px; background:var(--line); }
+  .paid-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(120,140,93,0.14); color:var(--pine);
+    font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:20px; margin-top:10px;
+  }
+  .confirm-wrap{ text-align:center; padding-top:20px;}
+  .confirm-badge{
+    width:66px; height:66px; margin:0 auto 18px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(63,90,76,0.22), transparent 70%);
+    display:flex; align-items:center; justify-content:center;
+    border:1px solid rgba(63,90,76,0.4);
+  }
+  .trip-line{ background:var(--paper); border:1px solid var(--line); border-radius:16px; padding:18px; text-align:left; margin-top:18px; box-shadow: 0 4px 14px rgba(34,48,58,0.06);}
+  .trip-stop{ display:flex; gap:12px; align-items:flex-start; }
+  .trip-dot{ width:9px; height:9px; border-radius:50%; margin-top:5px; flex-shrink:0;}
+  .trip-track{
+    width:2px; flex-shrink:0; background:repeating-linear-gradient(var(--gold) 0 4px, transparent 4px 8px);
+    margin:2px 0; align-self:stretch; min-height:22px;
+  }
+  .trip-label{ color:var(--slate); font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em;}
+  .trip-val{ color:var(--ink); font-size:13.5px; font-weight:600; margin-top:2px;}
+  .ref-code{
+    display:inline-block; margin-top:16px;
+    background:rgba(184,146,90,0.12); border:1px dashed var(--gold);
+    color:var(--azure-deep); font-size:12.5px; letter-spacing:0.06em;
+    padding:8px 14px; border-radius:10px; font-weight:600;
+  }
+  .price-card{
+    background:var(--paper); border:1px solid var(--line); border-radius:16px;
+    padding:16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;
+    box-shadow: 0 2px 8px rgba(34,48,58,0.05);
+  }
+  .price-card h4{ margin:0 0 4px; color:var(--ink); font-size:14px; }
+  .price-card p{ margin:0; color:var(--slate); font-size:11.5px; }
+  .price-tag{ color:var(--azure); font-family:'Poppins', sans-serif; font-size:15.5px; text-align:right; font-weight:600;}
+  .note-box{
+    background:rgba(184,146,90,0.1); border:1px solid var(--line); border-radius:14px;
+    padding:13px 14px; color:var(--slate); font-size:12px; line-height:1.5; margin-top:6px;
+  }
+  .contact-row{ display:flex; gap:12px; align-items:center; padding:14px 4px; border-bottom:1px solid var(--line); }
+  .contact-row:last-child{ border-bottom:none; }
+  .c-ico{ width:38px;height:38px; border-radius:11px; background:var(--sand); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .contact-row h4{ margin:0; color:var(--ink); font-size:13.5px; }
+  .contact-row p{ margin:2px 0 0; color:var(--slate); font-size:12px; }
+  .map-box{
+    height:120px; border-radius:16px; margin-top:14px;
+    background:
+      linear-gradient(165deg, var(--azure-2), var(--azure-deep)),
+      repeating-linear-gradient(-8deg, transparent 0 12px, rgba(255,255,255,0.06) 12px 14px);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    color:#FAF9F5; font-size:12px; font-weight:600; letter-spacing:0.03em;
+  }
+  .tabbar{
+    position:absolute; left:0; right:0; bottom:0;
+    background: rgba(255,253,248,0.94);
+    backdrop-filter: blur(14px);
+    border-top:1px solid var(--line);
+    display:flex; padding: 10px 6px 22px; z-index:40;
+  }
+  .tab{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:none; border:none; cursor:pointer; color:var(--slate);
+    font-family:'Lora', serif; font-size:10px; font-weight:600; padding:4px 0;
+  }
+  .tab.active{ color:var(--azure); }
+  .tab svg{ width:21px; height:21px; }
+  .toast{
+    position:absolute; top:64px; left:22px; right:22px;
+    background: linear-gradient(135deg,var(--gold-soft),var(--gold)); color:#141413; font-weight:700; font-size:12.5px;
+    padding:11px 14px; border-radius:12px; text-align:center;
+    transform:translateY(-140%); transition:transform .35s ease; z-index:60;
+    box-shadow: 0 8px 20px rgba(184,146,90,0.35);
+  }
+  .toast.show{ transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="notch"></div>
+  <div class="toast" id="toast">Demande envoyée avec succès</div>
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <span>●●●●</span>
+  </div>
+  <div class="stripe-band"></div>
+
+  <div class="app-header">
+    <div class="brand-row">
+      <div class="brand">Elite Driver <span>Azur Riviera</span></div>
+      <div class="header-right">
+        <div class="lang-switch">
+          <button class="lang-btn active" id="lang-fr" onclick="setLang('fr')">FR</button>
+          <button class="lang-btn" id="lang-en" onclick="setLang('en')">EN</button>
+        </div>
+        <div class="badge-24" data-i18n="badge24">24/7</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="content">
+
+    <!-- ===== ACCUEIL ===== -->
+    <section class="screen active" id="screen-accueil">
+      <div class="hero">
+        <svg class="route-line" viewBox="0 0 170 170" fill="none">
+          <path d="M8 100 Q 40 70, 70 95 T 130 90 Q 150 88, 160 60" stroke="#E8A088" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85"/>
+          <path d="M8 118 Q 40 88, 70 113 T 130 108 Q 150 106, 160 78" stroke="#E8A088" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
+          <circle cx="160" cy="60" r="4" fill="#E8A088"/>
+          <circle cx="8" cy="100" r="4" fill="#FAF9F5"/>
+        </svg>
+        <div class="hero-eyebrow" data-i18n="heroEyebrow">Nice · Cannes · Monaco</div>
+        <h1 data-i18n="heroTitle">Votre chauffeur privé sur toute la Côte d'Azur</h1>
+        <p data-i18n="heroText">Ponctualité, discrétion et véhicules premium. Réservez votre trajet en quelques instants.</p>
+        <button class="btn" data-i18n="heroBtn" onclick="goTo('reserver')">Réserver un trajet</button>
+      </div>
+
+      <div class="strip">
+        <div class="chip"><span class="n" data-i18n="chip1n">24h/24</span><span class="l" data-i18n="chip1l">7j/7 sur réservation</span></div>
+        <div class="chip"><span class="n" data-i18n="chip2n">4</span><span class="l" data-i18n="chip2l">services dédiés</span></div>
+        <div class="chip"><span class="n" data-i18n="chip3n">★ 5.0</span><span class="l" data-i18n="chip3l">clients satisfaits</span></div>
+      </div>
+
+      <div class="section-label" data-i18n="labelServices">Nos services</div>
+      <div class="service-row" onclick="goTo('services')">
+        <div class="service-icon">✈️</div>
+        <div><h3 data-i18n="svc1h">Transferts aéroport / gare</h3><p data-i18n="svc1pShort">Ponctualité irréprochable vers Nice-Côte d'Azur et les gares régionales.</p></div>
+      </div>
+      <div class="service-row" onclick="goTo('services')">
+        <div class="service-icon">🚗</div>
+        <div><h3 data-i18n="svc2h">Transport privé et VTC</h3><p data-i18n="svc2pShort">Rendez-vous d'affaires, excursions, chauffeur dédié.</p></div>
+      </div>
+
+      <div class="section-label" data-i18n="labelTestimonial">Témoignage</div>
+      <div class="quote-card">
+        <p data-i18n="quote1">"Service d'une qualité exceptionnelle. Ponctualité, confort et professionnalisme irréprochable."</p>
+        <div class="who" data-i18n="quote1who">— Stéphane L., client satisfait</div>
+      </div>
+    </section>
+
+    <!-- ===== RESERVER ===== -->
+    <section class="screen" id="screen-reserver">
+      <div class="screen-title" id="booking-title" data-i18n="bookTitle">Réserver un trajet</div>
+      <div class="screen-sub" id="booking-sub" data-i18n="bookSub">Remplissez les informations de votre course.</div>
+
+      <div id="booking-form-wrap">
+        <div class="stepper-dots"><span class="done"></span><span></span></div>
+
+        <div class="field"><label data-i18n="lblServiceType">Type de service</label></div>
+        <div class="segmented">
+          <div class="seg-btn active" data-price="45" data-service-fr="Transfert aéroport/gare" data-service-en="Airport/Station transfer"><span data-i18n="seg1">✈️ Aéroport / Gare</span></div>
+          <div class="seg-btn" data-price="60" data-service-fr="Transport privé / VTC" data-service-en="Private / VTC transport"><span data-i18n="seg2">🚗 VTC privé</span></div>
+          <div class="seg-btn" data-price="130" data-service-fr="Mise à disposition" data-service-en="Chauffeur at your disposal"><span data-i18n="seg3">⏱ Mise à disposition</span></div>
+          <div class="seg-btn" data-price="100" data-service-fr="Transport événementiel" data-service-en="Event transport"><span data-i18n="seg4">🥂 Événementiel</span></div>
+        </div>
+
+        <div class="field">
+          <label data-i18n="lblDepart">Adresse de départ</label>
+          <input type="text" id="f-depart" data-i18n-ph="phDepart" placeholder="Ex : Aéroport Nice Côte d'Azur">
+        </div>
+        <div class="field">
+          <label data-i18n="lblArrivee">Adresse d'arrivée</label>
+          <input type="text" id="f-arrivee" data-i18n-ph="phArrivee" placeholder="Ex : Hôtel Négresco, Nice">
+        </div>
+        <div class="row2">
+          <div class="field"><label data-i18n="lblDate">Date</label><input type="date" id="f-date"></div>
+          <div class="field"><label data-i18n="lblHeure">Heure</label><input type="time" id="f-heure"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label data-i18n="lblPassagers">Passagers</label><input type="number" id="f-passagers" min="1" value="1"></div>
+          <div class="field"><label data-i18n="lblBagages">Bagages</label><input type="number" id="f-bagages" min="0" value="1"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="lblNom">Nom complet</label>
+          <input type="text" id="f-nom" data-i18n-ph="phNom" placeholder="Votre nom">
+        </div>
+        <div class="row2">
+          <div class="field"><label data-i18n="lblTel">Téléphone</label><input type="tel" id="f-tel" placeholder="+33 6 00 00 00 00"></div>
+          <div class="field"><label data-i18n="lblEmail">E-mail</label><input type="email" id="f-email" placeholder="vous@email.com"></div>
+        </div>
+        <div class="field">
+          <label data-i18n="lblMessage">N° de vol / train, demandes spéciales</label>
+          <textarea id="f-message" data-i18n-ph="phMessage" placeholder="Ex : vol AF1234, siège bébé souhaité…"></textarea>
+        </div>
+
+        <button class="btn" data-i18n="btnSubmit" onclick="submitBooking()">Envoyer ma demande de réservation</button>
+      </div>
+
+      <div id="booking-payment" style="display:none;">
+        <div class="stepper-dots"><span class="done"></span><span class="done"></span></div>
+
+        <div class="pay-summary">
+          <div class="pay-summary-row">
+            <span data-i18n="payDepositLabel">Acompte à régler</span>
+            <span class="pay-amount" id="pay-amount">45 €</span>
+          </div>
+          <p class="pay-summary-note" data-i18n="payDepositNote">Le solde sera réglé directement auprès de votre chauffeur.</p>
+        </div>
+
+        <button class="apple-pay-btn" onclick="payNow()"><span>􀣺</span> <span data-i18n="applePayBtn">Payer avec Apple Pay</span></button>
+
+        <div class="pay-divider"><span data-i18n="orPayCard">ou par carte</span></div>
+
+        <div class="field">
+          <label data-i18n="lblCardName">Nom sur la carte</label>
+          <input type="text" id="p-name" data-i18n-ph="phCardName" placeholder="Jean Dupont">
+        </div>
+        <div class="field">
+          <label data-i18n="lblCardNumber">Numéro de carte</label>
+          <input type="text" id="p-number" inputmode="numeric" maxlength="19" placeholder="4242 4242 4242 4242" oninput="formatCardNumber(this)">
+        </div>
+        <div class="row2">
+          <div class="field"><label data-i18n="lblCardExpiry">Expiration</label><input type="text" id="p-expiry" placeholder="MM / AA" maxlength="7" oninput="formatExpiry(this)"></div>
+          <div class="field"><label data-i18n="lblCardCVC">CVC</label><input type="text" id="p-cvc" inputmode="numeric" maxlength="3" placeholder="123"></div>
+        </div>
+
+        <button class="btn" id="pay-card-btn" onclick="payNow()" data-i18n-amount="payBtn">Payer 45 €</button>
+        <button class="btn btn-ghost" style="margin-top:10px;" data-i18n="btnBackToForm" onclick="backToForm()">Modifier ma réservation</button>
+      </div>
+
+      <div id="booking-confirm" style="display:none;"></div>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="screen" id="screen-services">
+      <div class="screen-title" data-i18n="servicesTitle">Nos services</div>
+      <div class="screen-sub" data-i18n="servicesSub">Une gamme complète adaptée à toutes vos exigences.</div>
+
+      <div class="section-label" style="margin-top:22px;" data-i18n="labelTransport">Transport</div>
+      <div class="service-row">
+        <div class="service-icon">✈️</div>
+        <div><h3 data-i18n="svc1h">Transferts aéroport / gare</h3><p data-i18n="svc1pFull">Voyagez sans stress vers et depuis les aéroports et gares de la région, avec ponctualité et confort optimal.</p></div>
+      </div>
+      <div class="service-row">
+        <div class="service-icon">🚗</div>
+        <div><h3 data-i18n="svc2h">Transport privé et VTC</h3><p data-i18n="svc2pFull">Rendez-vous d'affaires, événements spéciaux ou excursions touristiques avec un chauffeur dédié.</p></div>
+      </div>
+      <div class="service-row">
+        <div class="service-icon">⏱</div>
+        <div><h3 data-i18n="svc3h">Mises à disposition</h3><p data-i18n="svc3p">Une voiture avec chauffeur à votre entière disposition pour une durée déterminée.</p></div>
+      </div>
+      <div class="service-row">
+        <div class="service-icon">🥂</div>
+        <div><h3 data-i18n="svc4h">Transport événementiel</h3><p data-i18n="svc4p">Mariages, séminaires : une logistique sans faille pour tous vos invités.</p></div>
+      </div>
+
+      <button class="btn btn-ghost" style="margin-top:8px;" data-i18n="btnQuote" onclick="goTo('reserver')">Demander un devis</button>
+    </section>
+
+    <!-- ===== TARIFS ===== -->
+    <section class="screen" id="screen-tarifs">
+      <div class="screen-title" data-i18n="pricingTitle">Nos tarifs</div>
+      <div class="screen-sub" data-i18n="pricingSub">Estimation indicative — devis exact envoyé après votre demande.</div>
+
+      <div class="price-card">
+        <div><h4 data-i18n="svc1h">Transferts aéroport / gare</h4><p data-i18n="price1sub">Nice, Cannes, Monaco</p></div>
+        <div class="price-tag" data-i18n="price1val">dès 45 €</div>
+      </div>
+      <div class="price-card">
+        <div><h4 data-i18n="svc2h">Transport privé / VTC</h4><p data-i18n="price2sub">Trajet simple</p></div>
+        <div class="price-tag" data-i18n="onQuote">sur devis</div>
+      </div>
+      <div class="price-card">
+        <div><h4 data-i18n="svc3h">Mise à disposition</h4><p data-i18n="price3sub">Par heure, chauffeur inclus</p></div>
+        <div class="price-tag" data-i18n="price3val">dès 65 €/h</div>
+      </div>
+      <div class="price-card">
+        <div><h4 data-i18n="svc4h">Transport événementiel</h4><p data-i18n="price4sub">Mariage, séminaire, groupe</p></div>
+        <div class="price-tag" data-i18n="onQuote">sur devis</div>
+      </div>
+
+      <div class="note-box" data-i18n="pricingNote">Ces montants sont des exemples à remplacer par votre grille tarifaire réelle. Le calcul automatique du prix (distance, horaires de nuit, majorations) peut être branché à votre moteur de tarification.</div>
+
+      <button class="btn" style="margin-top:16px;" data-i18n="btnQuotePrecise" onclick="goTo('reserver')">Obtenir un devis précis</button>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section class="screen" id="screen-contact">
+      <div class="screen-title" data-i18n="contactTitle">Contactez-nous</div>
+      <div class="screen-sub" data-i18n="contactSub">Passage du Moulin, 06800 Cagnes-sur-Mer, France</div>
+
+      <div class="map-box" data-i18n="mapLabel">📍 Cagnes-sur-Mer, Côte d'Azur</div>
+
+      <div style="margin-top:6px;">
+        <div class="contact-row">
+          <div class="c-ico">📞</div>
+          <div><h4 data-i18n="contactPhoneH">Téléphone</h4><p data-i18n="contactPhoneP">À renseigner (réservation 24h/24)</p></div>
+        </div>
+        <div class="contact-row">
+          <div class="c-ico">✉️</div>
+          <div><h4 data-i18n="contactEmailH">E-mail</h4><p data-i18n="contactEmailP">À renseigner</p></div>
+        </div>
+        <div class="contact-row">
+          <div class="c-ico">🕐</div>
+          <div><h4 data-i18n="contactHoursH">Horaires</h4><p data-i18n="contactHoursP">Du lundi au dimanche, 24h/24, sur réservation</p></div>
+        </div>
+      </div>
+
+      <button class="btn" style="margin-top:18px;" data-i18n="btnBookNow" onclick="goTo('reserver')">Réserver maintenant</button>
+      <button class="btn btn-ghost" style="margin-top:10px;" data-i18n="btnCall">Appeler directement</button>
+    </section>
+
+  </div>
+
+  <div class="tabbar">
+    <button class="tab active" data-screen="accueil" onclick="goTo('accueil')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>
+      <span data-i18n="tabHome">Accueil</span>
+    </button>
+    <button class="tab" data-screen="services" onclick="goTo('services')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+      <span data-i18n="tabServices">Services</span>
+    </button>
+    <button class="tab" data-screen="reserver" onclick="goTo('reserver')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      <span data-i18n="tabBook">Réserver</span>
+    </button>
+    <button class="tab" data-screen="tarifs" onclick="goTo('tarifs')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5.5C17 4 15 3 12 3s-5 1-5 2.5S9 8 12 8s5 1 5 2.5-2 2.5-5 2.5-5-1-5-2.5"/></svg>
+      <span data-i18n="tabPricing">Tarifs</span>
+    </button>
+    <button class="tab" data-screen="contact" onclick="goTo('contact')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v13H7l-3 3z"/></svg>
+      <span data-i18n="tabContact">Contact</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const translations = {
+    fr: {
+      badge24: "24/7",
+      heroEyebrow: "Nice · Cannes · Monaco",
+      heroTitle: "Votre chauffeur privé sur toute la Côte d'Azur",
+      heroText: "Ponctualité, discrétion et véhicules premium. Réservez votre trajet en quelques instants.",
+      heroBtn: "Réserver un trajet",
+      chip1n: "24h/24", chip1l: "7j/7 sur réservation",
+      chip2n: "4", chip2l: "services dédiés",
+      chip3n: "★ 5.0", chip3l: "clients satisfaits",
+      labelServices: "Nos services",
+      svc1h: "Transferts aéroport / gare",
+      svc1pShort: "Ponctualité irréprochable vers Nice-Côte d'Azur et les gares régionales.",
+      svc1pFull: "Voyagez sans stress vers et depuis les aéroports et gares de la région, avec ponctualité et confort optimal.",
+      svc2h: "Transport privé et VTC",
+      svc2pShort: "Rendez-vous d'affaires, excursions, chauffeur dédié.",
+      svc2pFull: "Rendez-vous d'affaires, événements spéciaux ou excursions touristiques avec un chauffeur dédié.",
+      svc3h: "Mises à disposition",
+      svc3p: "Une voiture avec chauffeur à votre entière disposition pour une durée déterminée.",
+      svc4h: "Transport événementiel",
+      svc4p: "Mariages, séminaires : une logistique sans faille pour tous vos invités.",
+      labelTestimonial: "Témoignage",
+      quote1: "\u201CService d'une qualité exceptionnelle. Ponctualité, confort et professionnalisme irréprochable.\u201D",
+      quote1who: "— Stéphane L., client satisfait",
+      bookTitle: "Réserver un trajet",
+      bookSub: "Remplissez les informations de votre course.",
+      lblServiceType: "Type de service",
+      seg1: "✈️ Aéroport / Gare", seg2: "🚗 VTC privé", seg3: "⏱ Mise à disposition", seg4: "🥂 Événementiel",
+      lblDepart: "Adresse de départ", phDepart: "Ex : Aéroport Nice Côte d'Azur",
+      lblArrivee: "Adresse d'arrivée", phArrivee: "Ex : Hôtel Négresco, Nice",
+      lblDate: "Date", lblHeure: "Heure",
+      lblPassagers: "Passagers", lblBagages: "Bagages",
+      lblNom: "Nom complet", phNom: "Votre nom",
+      lblTel: "Téléphone", lblEmail: "E-mail",
+      lblMessage: "N° de vol / train, demandes spéciales", phMessage: "Ex : vol AF1234, siège bébé souhaité…",
+      btnSubmit: "Envoyer ma demande de réservation",
+      servicesTitle: "Nos services",
+      servicesSub: "Une gamme complète adaptée à toutes vos exigences.",
+      labelTransport: "Transport",
+      btnQuote: "Demander un devis",
+      pricingTitle: "Nos tarifs",
+      pricingSub: "Estimation indicative — devis exact envoyé après votre demande.",
+      price1sub: "Nice, Cannes, Monaco", price1val: "dès 45 €",
+      price2sub: "Trajet simple",
+      price3sub: "Par heure, chauffeur inclus", price3val: "dès 65 €/h",
+      price4sub: "Mariage, séminaire, groupe",
+      onQuote: "sur devis",
+      pricingNote: "Ces montants sont des exemples à remplacer par votre grille tarifaire réelle. Le calcul automatique du prix (distance, horaires de nuit, majorations) peut être branché à votre moteur de tarification.",
+      btnQuotePrecise: "Obtenir un devis précis",
+      contactTitle: "Contactez-nous",
+      contactSub: "Passage du Moulin, 06800 Cagnes-sur-Mer, France",
+      mapLabel: "📍 Cagnes-sur-Mer, Côte d'Azur",
+      contactPhoneH: "Téléphone", contactPhoneP: "À renseigner (réservation 24h/24)",
+      contactEmailH: "E-mail", contactEmailP: "À renseigner",
+      contactHoursH: "Horaires", contactHoursP: "Du lundi au dimanche, 24h/24, sur réservation",
+      btnBookNow: "Réserver maintenant", btnCall: "Appeler directement",
+      tabHome: "Accueil", tabServices: "Services", tabBook: "Réserver", tabPricing: "Tarifs", tabContact: "Contact",
+      toastMissing: "Merci de compléter les champs obligatoires",
+      toastSent: "Demande envoyée avec succès",
+      confirmTitle: "Réservation envoyée",
+      confirmSub: "Nous revenons vers vous rapidement pour confirmer votre trajet.",
+      tripDepart: "Départ", tripArrivee: "Arrivée", tripService: "Service", tripWhen: "Quand",
+      refLabel: "Référence", backHome: "Retour à l'accueil",
+      paymentTitle: "Paiement de l'acompte",
+      paymentSub: "Un acompte sécurise votre réservation. Le solde est réglé au chauffeur.",
+      payDepositLabel: "Acompte à régler",
+      payDepositNote: "Le solde sera réglé directement auprès de votre chauffeur.",
+      applePayBtn: "Payer avec Apple Pay",
+      orPayCard: "ou par carte",
+      lblCardName: "Nom sur la carte", phCardName: "Jean Dupont",
+      lblCardNumber: "Numéro de carte",
+      lblCardExpiry: "Expiration", lblCardCVC: "CVC",
+      btnBackToForm: "Modifier ma réservation",
+      paymentProcessing: "Paiement en cours…",
+      paidLabel: "Payé"
+    },
+    en: {
+      badge24: "24/7",
+      heroEyebrow: "Nice · Cannes · Monaco",
+      heroTitle: "Your private chauffeur across the French Riviera",
+      heroText: "Punctuality, discretion and premium vehicles. Book your ride in a few taps.",
+      heroBtn: "Book a ride",
+      chip1n: "24/7", chip1l: "By reservation",
+      chip2n: "4", chip2l: "dedicated services",
+      chip3n: "★ 5.0", chip3l: "happy clients",
+      labelServices: "Our services",
+      svc1h: "Airport / station transfers",
+      svc1pShort: "Impeccable punctuality to and from Nice and regional stations.",
+      svc1pFull: "Travel stress-free to and from the region's airports and stations, with flawless punctuality and comfort.",
+      svc2h: "Private & VTC transport",
+      svc2pShort: "Business meetings, excursions, dedicated driver.",
+      svc2pFull: "Business meetings, special events or sightseeing tours with a dedicated driver.",
+      svc3h: "Chauffeur at your disposal",
+      svc3p: "A car with driver entirely at your disposal for a set duration.",
+      svc4h: "Event transport",
+      svc4p: "Weddings, seminars: seamless logistics for all your guests.",
+      labelTestimonial: "Testimonial",
+      quote1: "\u201CExceptional quality of service. Punctuality, comfort and flawless professionalism.\u201D",
+      quote1who: "— Stéphane L., satisfied client",
+      bookTitle: "Book a ride",
+      bookSub: "Fill in your trip details.",
+      lblServiceType: "Service type",
+      seg1: "✈️ Airport / Station", seg2: "🚗 Private VTC", seg3: "⏱ At your disposal", seg4: "🥂 Events",
+      lblDepart: "Pickup address", phDepart: "E.g. Nice Côte d'Azur Airport",
+      lblArrivee: "Drop-off address", phArrivee: "E.g. Hôtel Négresco, Nice",
+      lblDate: "Date", lblHeure: "Time",
+      lblPassagers: "Passengers", lblBagages: "Luggage",
+      lblNom: "Full name", phNom: "Your name",
+      lblTel: "Phone", lblEmail: "Email",
+      lblMessage: "Flight / train number, special requests", phMessage: "E.g. flight AF1234, baby seat needed…",
+      btnSubmit: "Send my booking request",
+      servicesTitle: "Our services",
+      servicesSub: "A full range tailored to all your needs.",
+      labelTransport: "Transport",
+      btnQuote: "Request a quote",
+      pricingTitle: "Our rates",
+      pricingSub: "Indicative estimate — exact quote sent after your request.",
+      price1sub: "Nice, Cannes, Monaco", price1val: "from €45",
+      price2sub: "Single ride",
+      price3sub: "Per hour, driver included", price3val: "from €65/h",
+      price4sub: "Wedding, seminar, group",
+      onQuote: "on request",
+      pricingNote: "These amounts are examples to replace with your actual pricing grid. Automatic price calculation (distance, night surcharges, fees) can be connected to your pricing engine.",
+      btnQuotePrecise: "Get an accurate quote",
+      contactTitle: "Contact us",
+      contactSub: "Passage du Moulin, 06800 Cagnes-sur-Mer, France",
+      mapLabel: "📍 Cagnes-sur-Mer, French Riviera",
+      contactPhoneH: "Phone", contactPhoneP: "To be added (24/7 booking)",
+      contactEmailH: "Email", contactEmailP: "To be added",
+      contactHoursH: "Hours", contactHoursP: "Monday to Sunday, 24/7, by reservation",
+      btnBookNow: "Book now", btnCall: "Call directly",
+      tabHome: "Home", tabServices: "Services", tabBook: "Book", tabPricing: "Rates", tabContact: "Contact",
+      toastMissing: "Please complete the required fields",
+      toastSent: "Request sent successfully",
+      confirmTitle: "Booking sent",
+      confirmSub: "We'll get back to you shortly to confirm your ride.",
+      tripDepart: "Pickup", tripArrivee: "Drop-off", tripService: "Service", tripWhen: "When",
+      refLabel: "Reference", backHome: "Back to home",
+      paymentTitle: "Deposit payment",
+      paymentSub: "A deposit secures your booking. The remaining balance is paid to your driver.",
+      payDepositLabel: "Deposit due",
+      payDepositNote: "The remaining balance will be paid directly to your driver.",
+      applePayBtn: "Pay with Apple Pay",
+      orPayCard: "or pay by card",
+      lblCardName: "Name on card", phCardName: "John Smith",
+      lblCardNumber: "Card number",
+      lblCardExpiry: "Expiry", lblCardCVC: "CVC",
+      btnBackToForm: "Edit my booking",
+      paymentProcessing: "Processing payment…",
+      paidLabel: "Paid"
+    }
+  };
+
+  let currentLang = 'fr';
+
+  function setLang(lang){
+    currentLang = lang;
+    document.getElementById('lang-fr').classList.toggle('active', lang==='fr');
+    document.getElementById('lang-en').classList.toggle('active', lang==='en');
+    const dict = translations[lang];
+
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      if(dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+      const key = el.getAttribute('data-i18n-ph');
+      if(dict[key] !== undefined) el.placeholder = dict[key];
+    });
+    document.documentElement.lang = lang;
+
+    if(pendingTrip){
+      const payBtn = document.getElementById('pay-card-btn');
+      if(payBtn) payBtn.textContent = (lang === 'fr' ? 'Payer ' : 'Pay ') + pendingTrip.amount + ' €';
+    }
+  }
+
+  function goTo(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-'+name).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.screen===name));
+    document.getElementById('content').scrollTop = 0;
+  }
+
+  document.querySelectorAll('.seg-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 2600);
+  }
+
+  let pendingTrip = null;
+
+  function formatCardNumber(el){
+    let v = el.value.replace(/\D/g,'').slice(0,16);
+    el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  }
+  function formatExpiry(el){
+    let v = el.value.replace(/\D/g,'').slice(0,4);
+    if(v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+    el.value = v;
+  }
+
+  function submitBooking(){
+    const dict = translations[currentLang];
+    const nom = document.getElementById('f-nom').value.trim();
+    const depart = document.getElementById('f-depart').value.trim();
+    const arrivee = document.getElementById('f-arrivee').value.trim();
+    const date = document.getElementById('f-date').value;
+    const heure = document.getElementById('f-heure').value;
+    const tel = document.getElementById('f-tel').value.trim();
+
+    if(!nom || !depart || !arrivee || !tel){
+      showToast(dict.toastMissing);
+      return;
+    }
+    const activeSeg = document.querySelector('.seg-btn.active');
+    const service = currentLang === 'fr' ? activeSeg.dataset.serviceFr : activeSeg.dataset.serviceEn;
+    const amount = activeSeg.dataset.price;
+    const ref = 'EDAR-' + Math.floor(1000 + Math.random()*9000);
+
+    pendingTrip = { nom, depart, arrivee, date, heure, tel, service, amount, ref };
+
+    document.getElementById('booking-title').textContent = dict.paymentTitle;
+    document.getElementById('booking-sub').textContent = dict.paymentSub;
+    document.getElementById('booking-form-wrap').style.display = 'none';
+
+    const payEl = document.getElementById('booking-payment');
+    payEl.style.display = 'block';
+    document.getElementById('pay-amount').textContent = amount + ' €';
+    const payBtn = document.getElementById('pay-card-btn');
+    payBtn.textContent = (currentLang === 'fr' ? 'Payer ' : 'Pay ') + amount + ' €';
+  }
+
+  function backToForm(){
+    const dict = translations[currentLang];
+    document.getElementById('booking-title').textContent = dict.bookTitle;
+    document.getElementById('booking-sub').textContent = dict.bookSub;
+    document.getElementById('booking-payment').style.display = 'none';
+    document.getElementById('booking-form-wrap').style.display = 'block';
+  }
+
+  function payNow(){
+    if(!pendingTrip) return;
+    const dict = translations[currentLang];
+    const payEl = document.getElementById('booking-payment');
+    const originalHTML = payEl.innerHTML;
+    payEl.innerHTML = `<div class="confirm-wrap"><div class="confirm-badge">⏳</div><p style="color:var(--slate); font-size:13px;">${dict.paymentProcessing}</p></div>`;
+
+    setTimeout(()=>{ showBookingConfirmation(); }, 1400);
+  }
+
+  function showBookingConfirmation(){
+    const dict = translations[currentLang];
+    const { depart, arrivee, date, heure, service, amount, ref } = pendingTrip;
+
+    document.getElementById('booking-title').textContent = dict.confirmTitle;
+    document.getElementById('booking-sub').textContent = dict.confirmSub;
+    document.getElementById('booking-payment').style.display = 'none';
+
+    const confirmEl = document.getElementById('booking-confirm');
+    confirmEl.style.display = 'block';
+    confirmEl.innerHTML = `
+      <div class="confirm-wrap">
+        <div class="confirm-badge">✅</div>
+        <div class="paid-badge">✓ ${dict.paidLabel} ${amount} €</div>
+        <div class="trip-line">
+          <div class="trip-stop">
+            <div class="trip-dot" style="background:var(--azure);"></div>
+            <div><div class="trip-label">${dict.tripDepart}</div><div class="trip-val">${depart}</div></div>
+          </div>
+          <div style="display:flex;"><div class="trip-track" style="margin-left:3.5px;"></div></div>
+          <div class="trip-stop">
+            <div class="trip-dot" style="background:var(--coral);"></div>
+            <div><div class="trip-label">${dict.tripArrivee}</div><div class="trip-val">${arrivee}</div></div>
+          </div>
+          <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--line); display:flex; justify-content:space-between;">
+            <div><div class="trip-label">${dict.tripService}</div><div class="trip-val" style="font-size:12.5px;">${service}</div></div>
+            <div style="text-align:right;"><div class="trip-label">${dict.tripWhen}</div><div class="trip-val" style="font-size:12.5px;">${date||'—'} ${heure||''}</div></div>
+          </div>
+        </div>
+        <div class="ref-code">${dict.refLabel} ${ref}</div>
+        <button class="btn btn-ghost" style="margin-top:22px;" onclick="resetBookingScreen()">${dict.backHome}</button>
+      </div>
+    `;
+    showToast(dict.toastSent);
+  }
+
+  function resetBookingScreen(){
+    document.getElementById('booking-confirm').style.display = 'none';
+    document.getElementById('booking-confirm').innerHTML = '';
+    document.getElementById('booking-form-wrap').style.display = 'block';
+    const dict = translations[currentLang];
+    document.getElementById('booking-title').textContent = dict.bookTitle;
+    document.getElementById('booking-sub').textContent = dict.bookSub;
+    pendingTrip = null;
+    goTo('accueil');
+  }
+</script>
+</body>
+</html>
