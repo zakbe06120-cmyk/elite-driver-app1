@@ -3,9 +3,9 @@ workflows:
     name: Elite Driver Azur Riviera - iOS
     max_build_duration: 60
     instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Elite Driver Codemagic
     environment:
-      groups:
-        - appstore_credentials   # à créer dans Codemagic (voir README-CODEMAGIC.md)
       vars:
         BUNDLE_ID: "com.elitedriverazurriviera.app"
         XCODE_WORKSPACE: "App/App.xcworkspace"
