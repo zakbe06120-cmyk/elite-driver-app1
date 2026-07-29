@@ -6,6 +6,9 @@ workflows:
     integrations:
       app_store_connect: Elite Driver Codemagic
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.elitedriverazurriviera.app
       vars:
         BUNDLE_ID: "com.elitedriverazurriviera.app"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
@@ -29,9 +32,17 @@ workflows:
       - name: Install CocoaPods dependencies
         script: |
           cd ios/App && pod install
-      - name: Set up code signing (App Store Connect API key)
+      - name: Set up keychain
+        script: keychain initialize
+      - name: Fetch signing files
         script: |
-          xcode-project use-profiles
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+      - name: Add certificates to keychain
+        script: keychain add-certificates
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
       - name: Build .ipa
         script: |
           xcode-project build-ipa \
