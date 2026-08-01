@@ -845,7 +845,21 @@
   }
 
   let pendingTrip = null;
-
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('payment') === 'success'){
+      const saved = localStorage.getItem('elitedriver_pending_trip');
+      const savedLang = localStorage.getItem('elitedriver_lang');
+      if(saved){
+        pendingTrip = JSON.parse(saved);
+        if(savedLang) setLang(savedLang);
+        goTo('reserver');
+        document.getElementById('booking-form-wrap').style.display = 'none';
+        showBookingConfirmation();
+        localStorage.removeItem('elitedriver_pending_trip');
+      }
+    }
+  });
   function formatCardNumber(el){
     let v = el.value.replace(/\D/g,'').slice(0,16);
     el.value = v.replace(/(.{4})/g,'$1 ').trim();
@@ -896,13 +910,32 @@
   }
 
   function payNow(){
-    if(!pendingTrip) return;
-    const dict = translations[currentLang];
-    const payEl = document.getElementById('booking-payment');
-    const originalHTML = payEl.innerHTML;
-    payEl.innerHTML = `<div class="confirm-wrap"><div class="confirm-badge">⏳</div><p style="color:var(--slate); font-size:13px;">${dict.paymentProcessing}</p></div>`;
+  if(!pendingTrip) return;
+  localStorage.setItem('elitedriver_pending_trip', JSON.stringify(pendingTrip));
+  localStorage.setItem('elitedriver_lang', currentLang);
 
-    setTimeout(()=>{ showBookingConfirmation(); }, 1400);
+  fetch('https://elite-driver1.vercel.app/api/create-checkout-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      amount: pendingTrip.amount,
+      service: pendingTrip.service,
+      depart: pendingTrip.depart,
+      arrivee: pendingTrip.arrivee
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if(data.url){
+      window.location.href = data.url;
+    } else {
+      showToast('Erreur de paiement, réessayez');
+    }
+  })
+  .catch(() => {
+    showToast('Erreur de connexion au paiement');
+  });
+}
   }
 
   function showBookingConfirmation(){
