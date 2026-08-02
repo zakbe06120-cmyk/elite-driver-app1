@@ -474,13 +474,16 @@
         </div>
 
         <div class="field">
-          <label data-i18n="lblDepart">Adresse de départ</label>
-          <input type="text" id="f-depart" data-i18n-ph="phDepart" placeholder="Ex : Aéroport Nice Côte d'Azur">
-        </div>
-        <div class="field">
-          <label data-i18n="lblArrivee">Adresse d'arrivée</label>
-          <input type="text" id="f-arrivee" data-i18n-ph="phArrivee" placeholder="Ex : Hôtel Négresco, Nice">
-        </div>
+  <label data-i18n="lblRoute">Trajet</label>
+  <select id="f-route">
+    <option value="">Choisissez un trajet</option>
+    <option value="Saint-Jean-Cap-Ferrat|Aéroport de Nice|70">Saint-Jean-Cap-Ferrat → Aéroport de Nice — 70€</option>
+    <option value="Beaulieu-sur-Mer|Aéroport de Nice|70">Beaulieu-sur-Mer → Aéroport de Nice — 70€</option>
+    <option value="Villefranche-sur-Mer|Aéroport de Nice|50">Villefranche-sur-Mer → Aéroport de Nice — 50€</option>
+    <option value="Monaco|Aéroport de Nice|100">Monaco → Aéroport de Nice — 100€</option>
+    <option value="Aéroport de Nice|Saint-Tropez|280">Aéroport de Nice → Saint-Tropez — 280€</option>
+  </select>
+</div>
         <div class="row2">
           <div class="field"><label data-i18n="lblDate">Date</label><input type="date" id="f-date"></div>
           <div class="field"><label data-i18n="lblHeure">Heure</label><input type="time" id="f-heure"></div>
@@ -873,8 +876,8 @@
   function submitBooking(){
     const dict = translations[currentLang];
     const nom = document.getElementById('f-nom').value.trim();
-    const depart = document.getElementById('f-depart').value.trim();
-    const arrivee = document.getElementById('f-arrivee').value.trim();
+    const routeVal = document.getElementById('f-route').value;
+    const [depart, arrivee, routePrice] = routeVal.split('|');
     const date = document.getElementById('f-date').value;
     const heure = document.getElementById('f-heure').value;
     const tel = document.getElementById('f-tel').value.trim();
@@ -885,7 +888,7 @@
     }
     const activeSeg = document.querySelector('.seg-btn.active');
     const service = currentLang === 'fr' ? activeSeg.dataset.serviceFr : activeSeg.dataset.serviceEn;
-    const amount = activeSeg.dataset.price;
+    const amount = routePrice;
     const ref = 'EDAR-' + Math.floor(1000 + Math.random()*9000);
 
     pendingTrip = { nom, depart, arrivee, date, heure, tel, service, amount, ref };
