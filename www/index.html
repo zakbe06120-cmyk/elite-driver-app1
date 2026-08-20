@@ -390,6 +390,28 @@
     box-shadow: 0 8px 20px rgba(184,146,90,0.35);
   }
   .toast.show{ transform:translateY(0); }
+  @media (max-width: 1366px) {
+  body {
+    padding: 0;
+    background: var(--sand);
+    display: block;
+  }
+
+  .device {
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .notch {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
