@@ -390,6 +390,8 @@
   .whatsapp-open{display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border-radius:12px;background:#25D366;color:#102519;text-decoration:none;font:600 13px 'Poppins',sans-serif;}
   .contact-row{ display:flex; gap:12px; align-items:center; padding:14px 4px; border-bottom:1px solid var(--line); }
   .contact-row:last-child{ border-bottom:none; }
+  .contact-link{display:block;color:inherit;text-decoration:none;}
+  .contact-link:focus-visible{outline:2px solid var(--azure);outline-offset:3px;border-radius:4px;}
   .c-ico{ width:38px;height:38px; border-radius:11px; background:var(--sand); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .contact-row h4{ margin:0; color:var(--ink); font-size:13.5px; }
   .contact-row p{ margin:2px 0 0; color:var(--slate); font-size:12px; }
@@ -781,7 +783,7 @@
           <img class="whatsapp-qr" src="data:image/png;base64,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" alt="QR code WhatsApp Elite">
         </div>
         <p data-i18n="whatsappScan">Scannez ce code pour démarrer une discussion WhatsApp avec Elite.</p>
-        <a class="whatsapp-open" href="https://wa.me/33777144259" target="_blank" rel="noopener" data-i18n="whatsappOpen">Ouvrir WhatsApp</a>
+        <a class="whatsapp-open" href="https://wa.me/33777144250" target="_blank" rel="noopener" data-i18n="whatsappOpen">Ouvrir WhatsApp</a>
       </div>
 
       <div class="map-box" data-i18n="mapLabel">📍 Cagnes-sur-Mer, Côte d'Azur</div>
@@ -789,11 +791,11 @@
       <div style="margin-top:6px;">
         <div class="contact-row">
           <div class="c-ico">📞</div>
-          <div><h4 data-i18n="contactPhoneH">Téléphone</h4><p data-i18n="contactPhoneP">+33 7 77 14 42 59 (réservation 24h/24)</p></div>
+          <a class="contact-link" href="tel:+33777144250"><h4 data-i18n="contactPhoneH">Téléphone</h4><p data-i18n="contactPhoneP">+33 7 77 14 42 50</p></a>
         </div>
         <div class="contact-row">
           <div class="c-ico">✉️</div>
-          <div><h4 data-i18n="contactEmailH">E-mail</h4><p data-i18n="contactEmailP">elitedrivervtc1@gmail.com</p></div>
+          <a class="contact-link" href="mailto:elitedrivervtc1@gmail.com"><h4 data-i18n="contactEmailH">E-mail</h4><p data-i18n="contactEmailP">elitedrivervtc1@gmail.com</p></a>
         </div>
         <div class="contact-row">
           <div class="c-ico">🕐</div>
@@ -802,7 +804,7 @@
       </div>
 
       <button class="btn" style="margin-top:18px;" data-i18n="btnBookNow" onclick="planAirportTransfer()">Réserver maintenant</button>
-      <a class="btn btn-ghost" style="margin-top:10px;" data-i18n="btnCall" href="tel:+33777144259">Appeler directement</a>
+      <a class="btn btn-ghost" style="margin-top:10px;" data-i18n="btnCall" href="tel:+33777144250">Appeler directement</a>
     </section>
 
   </div>
@@ -909,8 +911,8 @@
       whatsappOpen: "Ouvrir WhatsApp",
       contactSub: "Passage du Moulin, 06800 Cagnes-sur-Mer, France",
       mapLabel: "📍 Cagnes-sur-Mer, Côte d'Azur",
-      contactPhoneH: "Téléphone", contactPhoneP: "À renseigner (réservation 24h/24)",
-      contactEmailH: "E-mail", contactEmailP: "À renseigner",
+      contactPhoneH: "Téléphone", contactPhoneP: "+33 7 77 14 42 50",
+      contactEmailH: "E-mail", contactEmailP: "elitedrivervtc1@gmail.com",
       contactHoursH: "Horaires", contactHoursP: "Du lundi au dimanche, 24h/24, sur réservation",
       btnBookNow: "Réserver maintenant", btnCall: "Appeler directement",
       tabHome: "Accueil", tabServices: "Services", tabBook: "Aéroport", tabPricing: "Tarifs", tabContact: "WhatsApp",
@@ -1019,8 +1021,8 @@
       whatsappOpen: "Open WhatsApp",
       contactSub: "Passage du Moulin, 06800 Cagnes-sur-Mer, France",
       mapLabel: "📍 Cagnes-sur-Mer, French Riviera",
-      contactPhoneH: "Phone", contactPhoneP: "To be added (24/7 booking)",
-      contactEmailH: "Email", contactEmailP: "To be added",
+      contactPhoneH: "Phone", contactPhoneP: "+33 7 77 14 42 50",
+      contactEmailH: "Email", contactEmailP: "elitedrivervtc1@gmail.com",
       contactHoursH: "Hours", contactHoursP: "Monday to Sunday, 24/7, by reservation",
       btnBookNow: "Book now", btnCall: "Call directly",
       tabHome: "Home", tabServices: "Services", tabBook: "Airport", tabPricing: "Rates", tabContact: "WhatsApp",
