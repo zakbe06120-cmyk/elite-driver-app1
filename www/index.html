@@ -542,6 +542,20 @@
   .music-toggle span:first-child{font-size:14px;color:#f2b09a;}
   .music-toggle[aria-pressed="true"]{background:rgba(255,255,255,.18);}
   .music-toggle:focus-visible{outline:2px solid #f2b09a;outline-offset:3px;}
+  .hero-promo{gap:7px;margin:0 0 12px;padding:4px 8px;border:1px solid rgba(255,255,255,.2);border-radius:99px;background:rgba(255,255,255,.1);width:max-content;backdrop-filter:blur(6px);}
+  .hero-promo-rate{display:inline-grid;place-items:center;width:auto;height:auto;padding:3px 6px;border-radius:99px;background:linear-gradient(145deg,#f1ae96,#d97757);color:#192d37;font:700 9px 'Poppins',sans-serif;}
+  .hero-promo-copy{font-size:9px;color:rgba(255,253,248,.82);}
+  .welcome-offer-banner{margin:0 0 10px;padding:5px 8px;border-radius:8px;font-size:9px;line-height:1.25;}
+  .vehicle-selection{margin:12px 0 14px;padding:0;border:0;min-width:0;}
+  .vehicle-selection legend{margin-bottom:7px;color:var(--slate);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+  .vehicle-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .vehicle-option{display:flex;align-items:center;gap:8px;min-height:54px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--paper);cursor:pointer;}
+  .vehicle-option:has(input:checked){border-color:var(--azure);background:rgba(106,155,204,.1);box-shadow:0 0 0 1px rgba(106,155,204,.12);}
+  .vehicle-option input{width:15px;height:15px;margin:0;flex-shrink:0;accent-color:var(--azure-deep);}
+  .vehicle-option strong,.vehicle-option small{display:block;}
+  .vehicle-option strong{color:var(--ink);font:600 11px 'Poppins',sans-serif;}
+  .vehicle-option small{margin-top:2px;color:var(--slate);font-size:9px;line-height:1.25;}
+  .vehicle-payment-row{margin-bottom:10px;}
 </style>
 </head>
 <body>
@@ -579,24 +593,13 @@
         <div class="hero-eyebrow" data-i18n="heroEyebrow">Transferts privés · Côte d'Azur</div>
         <h1 data-i18n="heroTitle">La Riviera, à votre rythme.</h1>
         <p data-i18n="heroText">Un chauffeur privé, un trajet sans stress. Nice, Cannes, Monaco et toute la région.</p>
-        <div class="hero-promo" id="home-welcome-offer">
-          <span class="hero-promo-rate">−15%</span>
-          <span class="hero-promo-copy"><strong data-i18n="homeOfferTitle">Offre de bienvenue</strong><small data-i18n="homeOfferSub">Sur votre première réservation</small></span>
+        <div class="hero-promo" id="home-welcome-offer" aria-label="Offre de bienvenue">
+          <span class="hero-promo-rate">−15 %</span>
+          <span class="hero-promo-copy" data-i18n="homeOfferTiny">sur votre première réservation</span>
         </div>
         <button class="btn" data-i18n="heroBtn" onclick="planAirportTransfer()">Planifier mon trajet <span aria-hidden="true">→</span></button>
         <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" onclick="toggleWelcomeMusic()"><span aria-hidden="true">♫</span><span data-i18n="musicPlay">Écouter la musique</span></button>
         <audio id="welcome-music" src="ambiance-elite-driver-originale.wav" loop preload="none"></audio>
-      </div>
-
-      <div class="airport-planner-card">
-        <div class="airport-planner-copy">
-          <span class="airport-planner-icon" aria-hidden="true">✈️</span>
-          <div>
-            <strong data-i18n="airportPlannerTitle">Planifier votre trajet aéroport</strong>
-            <span data-i18n="airportPlannerSub">Choisissez votre départ et votre horaire. Le tarif s’affiche avant de continuer.</span>
-          </div>
-        </div>
-        <button class="airport-planner-cta" type="button" onclick="planAirportTransfer()" data-i18n="airportPlannerBtn">Planifier mon trajet</button>
       </div>
 
       <div class="strip">
@@ -671,6 +674,13 @@
           <div><span class="airport-price-label" data-i18n="airportFareLabel">Tarif fixe</span><span class="airport-route-description" id="airport-route-description" data-i18n="airportFareHint">Choisissez un départ pour afficher votre trajet.</span></div>
           <div class="airport-price-values"><span class="airport-price-original" id="airport-route-price-original" hidden></span><strong id="airport-route-price">—</strong></div>
         </div>
+        <fieldset class="vehicle-selection">
+          <legend data-i18n="vehicleTitle">Gamme de véhicule</legend>
+          <div class="vehicle-options">
+            <label class="vehicle-option"><input type="radio" name="vehicleType" value="Berline" checked><span><strong data-i18n="vehicleBerline">Berline</strong><small data-i18n="vehicleBerlineSub">Élégance au quotidien</small></span></label>
+            <label class="vehicle-option"><input type="radio" name="vehicleType" value="Comfort"><span><strong data-i18n="vehicleComfort">Comfort</strong><small data-i18n="vehicleComfortSub">Confort supérieur</small></span></label>
+          </div>
+        </fieldset>
         <div class="welcome-offer-banner" id="welcome-offer-banner" hidden aria-live="polite"><span aria-hidden="true">🏷️</span><span data-i18n="welcomeOffer">Offre première réservation : 15 % de remise sur ce trajet.</span></div>
         <div class="row2">
           <div class="field"><label data-i18n="lblDate">Date</label><input type="date" id="f-date" required></div>
@@ -710,6 +720,10 @@
         <div class="pay-summary">
           <div class="pay-original-line" id="pay-original-line"><span data-i18n="payOriginalFare">Tarif initial</span><s id="pay-original-amount"></s></div>
           <div class="pay-discount-line" id="pay-discount-line"><span data-i18n="payWelcomeDiscount">Remise nouveau client −15 %</span><span id="pay-discount-amount"></span></div>
+          <div class="pay-summary-row vehicle-payment-row">
+            <span data-i18n="vehicleTitle">Gamme de véhicule</span>
+            <span id="pay-vehicle-type">Berline</span>
+          </div>
           <div class="pay-summary-row">
             <span data-i18n="payDepositLabel">Acompte à régler</span>
             <span class="pay-amount" id="pay-amount">45 €</span>
@@ -857,6 +871,7 @@
       heroText: "Un chauffeur privé, un trajet sans stress. Nice, Cannes, Monaco et toute la région.",
       homeOfferTitle: "Offre de bienvenue",
       homeOfferSub: "Sur votre première réservation",
+      homeOfferTiny: "sur votre première réservation",
       heroBtn: "Planifier mon trajet  →",
       musicPlay: "Écouter la musique",
       musicPause: "Mettre en pause",
@@ -923,6 +938,7 @@
       lblArrivee: "Destination", phArrivee: "Ex : Hôtel Négresco, Nice",
       lblDate: "Date", lblHeure: "Heure",
       lblPassagers: "Passagers", lblBagages: "Bagages",
+      vehicleTitle: "Gamme de véhicule", vehicleBerline: "Berline", vehicleBerlineSub: "Élégance au quotidien", vehicleComfort: "Comfort", vehicleComfortSub: "Confort supérieur",
       lblNom: "Nom complet", phNom: "Votre nom",
       lblTel: "Téléphone", lblEmail: "E-mail",
       lblMessage: "N° de vol / train, demandes spéciales", phMessage: "Ex : vol AF1234, siège bébé souhaité…",
@@ -978,6 +994,7 @@
       heroText: "Your private chauffeur, a smooth ride. Nice, Cannes, Monaco and beyond.",
       homeOfferTitle: "Welcome offer",
       homeOfferSub: "On your first booking",
+      homeOfferTiny: "on your first booking",
       heroBtn: "Plan my ride  →",
       musicPlay: "Play the music",
       musicPause: "Pause the music",
@@ -1044,6 +1061,7 @@
       lblArrivee: "Destination", phArrivee: "E.g. Hôtel Négresco, Nice",
       lblDate: "Date", lblHeure: "Time",
       lblPassagers: "Passengers", lblBagages: "Luggage",
+      vehicleTitle: "Vehicle range", vehicleBerline: "Berline", vehicleBerlineSub: "Everyday elegance", vehicleComfort: "Comfort", vehicleComfortSub: "Extra comfort",
       lblNom: "Full name", phNom: "Your name",
       lblTel: "Phone", lblEmail: "Email",
       lblMessage: "Flight / train number, special requests", phMessage: "E.g. flight AF1234, baby seat needed…",
@@ -1327,6 +1345,7 @@
     const date = document.getElementById('f-date').value;
     const heure = document.getElementById('f-heure').value;
     const tel = document.getElementById('f-tel').value.trim();
+    const vehicleType = document.querySelector('input[name="vehicleType"]:checked')?.value || 'Berline';
 
     if(!nom || !depart || !arrivee || !tel){
       showToast(dict.toastMissing);
@@ -1334,12 +1353,13 @@
     }
     if(routePrice==='quote'){
       const english=currentLang==='en';
-      const labels=english?{intro:'Hello, I would like a quote for a ride.',departure:'Pickup',destination:'Destination',date:'Date',passengers:'Passengers',luggage:'Luggage',name:'Name',phone:'Phone',email:'Email',notes:'Notes'}:{intro:'Bonjour, je souhaite un devis pour un trajet.',departure:'Départ',destination:'Destination',date:'Date',passengers:'Passagers',luggage:'Bagages',name:'Nom',phone:'Téléphone',email:'E-mail',notes:'Précisions'};
+      const labels=english?{intro:'Hello, I would like a quote for a ride.',departure:'Pickup',destination:'Destination',date:'Date',vehicle:'Vehicle',passengers:'Passengers',luggage:'Luggage',name:'Name',phone:'Phone',email:'Email',notes:'Notes'}:{intro:'Bonjour, je souhaite un devis pour un trajet.',departure:'Départ',destination:'Destination',date:'Date',vehicle:'Véhicule',passengers:'Passagers',luggage:'Bagages',name:'Nom',phone:'Téléphone',email:'E-mail',notes:'Précisions'};
       const details=[
         labels.intro,
         labels.departure+' : '+depart,
         labels.destination+' : '+arrivee,
         labels.date+' : '+date+' à '+heure,
+        labels.vehicle+' : '+vehicleType,
         labels.passengers+' : '+document.getElementById('f-passagers').value,
         labels.luggage+' : '+document.getElementById('f-bagages').value,
         labels.name+' : '+nom,
@@ -1351,13 +1371,14 @@
       return;
     }
     const service = translations[currentLang].airportServiceName;
+    document.getElementById('pay-vehicle-type').textContent=vehicleType;
     const baseAmount = Number(routePrice);
     const welcomeOffer = localStorage.getItem('elitedriver_welcome_offer_used')!=='true';
     const amount = welcomeOffer ? Math.round(baseAmount*0.85*100)/100 : baseAmount;
     const discountAmount = Math.round((baseAmount-amount)*100)/100;
     const ref = 'EDAR-' + Math.floor(1000 + Math.random()*9000);
 
-    pendingTrip = { nom, depart, arrivee, date, heure, tel, service, amount, baseAmount, discountAmount, welcomeOffer, ref };
+    pendingTrip = { nom, depart, arrivee, date, heure, tel, service, vehicleType, amount, baseAmount, discountAmount, welcomeOffer, ref };
 
     document.getElementById('booking-title').textContent = dict.paymentTitle;
     document.getElementById('booking-sub').textContent = dict.paymentSub;
@@ -1395,7 +1416,8 @@
       amount: pendingTrip.amount,
       service: pendingTrip.service,
       depart: pendingTrip.depart,
-      arrivee: pendingTrip.arrivee
+      arrivee: pendingTrip.arrivee,
+      vehicleType: pendingTrip.vehicleType
     })
   })
   .then(r => r.json())
