@@ -874,6 +874,7 @@
       airportOtherPlaceholder: "Saisissez une ville ou une adresse",
       airportOtherDestinationPlaceholder: "Saisissez une ville ou une adresse",
       airportOnQuote: "Sur devis",
+      airportQuoteLabel: "Tarif sur devis",
       btnQuoteSubmit: "Demander mon devis sur WhatsApp",
       toastOtherLocationMissing: "Indiquez votre ville ou adresse pour continuer.",
       welcomeOffer: "Offre première réservation sur cet appareil : 15 % de remise.",
@@ -992,6 +993,7 @@
       airportOtherPlaceholder: "Enter a town or address",
       airportOtherDestinationPlaceholder: "Enter a town or address",
       airportOnQuote: "Quote required",
+      airportQuoteLabel: "Quote required",
       btnQuoteSubmit: "Request a quote on WhatsApp",
       toastOtherLocationMissing: "Enter your town or address to continue.",
       welcomeOffer: "First booking on this device: 15% off.",
@@ -1149,6 +1151,7 @@
     const originalPrice=document.getElementById('airport-route-price-original');
     const offerBanner=document.getElementById('welcome-offer-banner');
     const description=document.getElementById('airport-route-description');
+    const fareLabel=document.querySelector('.airport-price-label');
     if(!origin||!destination||!route||!price||!description) return;
 
     const originChanged=destination.dataset.origin!==origin.value;
@@ -1195,6 +1198,7 @@
     if(submitButton) submitButton.textContent=translations[currentLang][hasRoute&&!amount?'btnQuoteSubmit':'btnSubmit'];
 
     if(amount){
+      if(fareLabel) fareLabel.textContent=translations[currentLang].airportFareLabel;
       const discounted=Math.round(amount*0.85*100)/100;
       price.textContent=(offerAvailable?discounted:amount).toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:offerAvailable?2:0,maximumFractionDigits:2})+' €';
       originalPrice.hidden=!offerAvailable;
@@ -1202,6 +1206,7 @@
       offerBanner.hidden=!offerAvailable;
       description.textContent=airportLocationLabel(origin.value)+' → '+airportLocationLabel(destination.value);
     }else if(hasRoute){
+      if(fareLabel) fareLabel.textContent=translations[currentLang].airportQuoteLabel;
       price.textContent=translations[currentLang].airportOnQuote;
       originalPrice.hidden=true;
       offerBanner.hidden=true;
@@ -1209,6 +1214,7 @@
       const displayedDestination=destinationIsOther?(destinationValue||translations[currentLang].airportOther):airportLocationLabel(destination.value);
       description.textContent=displayedOrigin+' → '+displayedDestination;
     }else{
+      if(fareLabel) fareLabel.textContent=translations[currentLang].airportFareLabel;
       price.textContent='—';
       originalPrice.hidden=true;
       offerBanner.hidden=true;
@@ -1300,17 +1306,19 @@
       return;
     }
     if(routePrice==='quote'){
+      const english=currentLang==='en';
+      const labels=english?{intro:'Hello, I would like a quote for a ride.',departure:'Pickup',destination:'Destination',date:'Date',passengers:'Passengers',luggage:'Luggage',name:'Name',phone:'Phone',email:'Email',notes:'Notes'}:{intro:'Bonjour, je souhaite un devis pour un trajet.',departure:'Départ',destination:'Destination',date:'Date',passengers:'Passagers',luggage:'Bagages',name:'Nom',phone:'Téléphone',email:'E-mail',notes:'Précisions'};
       const details=[
-        'Bonjour, je souhaite un devis pour un trajet.',
-        'Départ : '+depart,
-        'Destination : '+arrivee,
-        'Date : '+date+' à '+heure,
-        'Passagers : '+document.getElementById('f-passagers').value,
-        'Bagages : '+document.getElementById('f-bagages').value,
-        'Nom : '+nom,
-        'Téléphone : '+tel,
-        document.getElementById('f-email').value.trim()?'E-mail : '+document.getElementById('f-email').value.trim():'',
-        document.getElementById('f-message').value.trim()?'Précisions : '+document.getElementById('f-message').value.trim():''
+        labels.intro,
+        labels.departure+' : '+depart,
+        labels.destination+' : '+arrivee,
+        labels.date+' : '+date+' à '+heure,
+        labels.passengers+' : '+document.getElementById('f-passagers').value,
+        labels.luggage+' : '+document.getElementById('f-bagages').value,
+        labels.name+' : '+nom,
+        labels.phone+' : '+tel,
+        document.getElementById('f-email').value.trim()?labels.email+' : '+document.getElementById('f-email').value.trim():'',
+        document.getElementById('f-message').value.trim()?labels.notes+' : '+document.getElementById('f-message').value.trim():''
       ].filter(Boolean).join('\n');
       window.location.href='https://wa.me/33777144250?text='+encodeURIComponent(details);
       return;
