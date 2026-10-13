@@ -144,51 +144,34 @@
   .screen.active{ display:block; }
   @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
   .hero{
+    min-height:360px;
     margin-top:14px;
-    border-radius: var(--radius);
-    background:
-      radial-gradient(120% 140% at 100% 0%, rgba(231,207,164,0.35), transparent 55%),
-      linear-gradient(165deg, var(--azure-2), var(--azure-deep) 75%);
-    border:1px solid rgba(255,255,255,0.12);
-    padding:24px 20px 22px;
+    padding:23px 20px 20px;
+    border-radius:26px;
     position:relative;
     overflow:hidden;
-    box-shadow: 0 14px 30px rgba(14,92,126,0.28);
+    isolation:isolate;
+    background:radial-gradient(130% 95% at 100% 0%,rgba(232,160,136,.35),transparent 58%),linear-gradient(155deg,#27485a 0%,#173447 58%,#102936 100%);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:0 18px 34px rgba(22,53,70,.26);
   }
   .hero::before{
-    content:'';
-    position:absolute; left:0; right:0; bottom:0; height:34px;
-    background: repeating-linear-gradient(-8deg, transparent 0 10px, rgba(255,255,255,0.08) 10px 12px);
+    content:'';position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(90deg,rgba(16,41,54,.1) 0%,rgba(16,41,54,.08) 58%,rgba(16,41,54,.02) 100%);
   }
-  .route-line{
-    position:absolute;
-    right:-24px; top:-18px;
-    width:150px; height:150px;
-    opacity:0.85;
-  }
-  .hero-eyebrow{
-    color:var(--gold-soft);
-    font-size:11px;
-    letter-spacing:0.16em;
-    text-transform:uppercase;
-    font-weight:600;
-  }
-  .hero h1{
-    font-family:'Poppins', sans-serif;
-    font-weight:600;
-    font-size:24px;
-    line-height:1.28;
-    color:#FAF9F5;
-    margin:9px 0 10px;
-    max-width:230px;
-  }
-  .hero p{
-    color:rgba(255,253,248,0.82);
-    font-size:13.5px;
-    line-height:1.5;
-    max-width:250px;
-    margin:0 0 18px;
-  }
+  .hero-visual{position:absolute;z-index:-1;right:-19px;bottom:3px;width:min(94%,330px);height:auto;opacity:.88;pointer-events:none;}
+  .hero-eyebrow{display:flex;align-items:center;gap:7px;color:#f3b09a;font:700 9px 'Poppins',sans-serif;letter-spacing:.16em;text-transform:uppercase;}
+  .hero-eyebrow::before{content:'';width:18px;height:1px;background:#f3b09a;}
+  .hero h1{max-width:285px;margin:13px 0 9px;color:#fffdf8;font:600 27px/1.2 'Poppins',sans-serif;letter-spacing:-.035em;}
+  .hero p{max-width:270px;margin:0 0 15px;color:rgba(255,253,248,.78);font-size:12.5px;line-height:1.55;}
+  .hero-promo{display:flex;align-items:center;gap:10px;width:max-content;max-width:100%;margin:0 0 15px;padding:8px 12px 8px 8px;border:1px solid rgba(255,255,255,.22);border-radius:14px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);color:#fffdf8;}
+  .hero-promo[hidden]{display:none;}
+  .hero-promo-rate{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,#f1ae96,#d97757);color:#192d37;font:700 12px 'Poppins',sans-serif;}
+  .hero-promo-copy strong,.hero-promo-copy small{display:block;}
+  .hero-promo-copy strong{font:600 10.5px 'Poppins',sans-serif;}
+  .hero-promo-copy small{margin-top:2px;color:rgba(255,253,248,.76);font-size:9.5px;}
+  .hero .btn{position:relative;z-index:1;min-height:48px;border:1px solid rgba(255,255,255,.28);border-radius:14px;background:linear-gradient(135deg,#f2b09a,#df7958);box-shadow:0 8px 22px rgba(13,30,38,.2);font-family:'Poppins',sans-serif;font-size:13px;}
+  @media (prefers-reduced-motion:no-preference){.hero .btn:hover{transform:translateY(-2px);filter:brightness(1.04);}}
   .btn{
     display:inline-flex;
     align-items:center;
@@ -581,16 +564,27 @@
     <!-- ===== ACCUEIL ===== -->
     <section class="screen active" id="screen-accueil">
       <div class="hero">
-        <svg class="route-line" viewBox="0 0 170 170" fill="none">
-          <path d="M8 100 Q 40 70, 70 95 T 130 90 Q 150 88, 160 60" stroke="#E8A088" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.85"/>
-          <path d="M8 118 Q 40 88, 70 113 T 130 108 Q 150 106, 160 78" stroke="#E8A088" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.5"/>
-          <circle cx="160" cy="60" r="4" fill="#E8A088"/>
-          <circle cx="8" cy="100" r="4" fill="#FAF9F5"/>
+        <svg class="hero-visual" viewBox="0 0 360 190" fill="none" aria-hidden="true">
+          <circle cx="278" cy="47" r="27" fill="#E8A088" fill-opacity=".86"/>
+          <path d="M0 128C42 117 62 78 103 88c37 9 51 54 93 41 39-12 57-51 92-35 24 11 40 7 72-5v101H0v-62Z" fill="#8AB1D8" fill-opacity=".48"/>
+          <path d="M0 145c43-18 75-39 112-25 37 14 49 38 91 19 33-15 49-37 77-20 25 15 45 10 80-4" stroke="#F7E9D8" stroke-opacity=".65" stroke-width="2"/>
+          <path d="M0 160c53-10 76-28 112-17 43 14 61 27 98 8 33-17 48-24 74-11 25 13 44 8 76-4" stroke="#F7E9D8" stroke-opacity=".32" stroke-width="1.5"/>
+          <path d="M95 156h114c8 0 13 6 14 13l2 8H81l3-11c1-6 5-10 11-10Z" fill="#F7F4EC" fill-opacity=".92"/>
+          <path d="m110 155 15-19c3-4 7-6 12-6h32c5 0 10 2 13 6l16 19" fill="#F7F4EC" fill-opacity=".92"/>
+          <path d="m130 151 11-14c2-2 4-3 7-3h17c3 0 5 1 7 3l11 14" fill="#27485A"/>
+          <circle cx="111" cy="177" r="8" fill="#122B37"/><circle cx="204" cy="177" r="8" fill="#122B37"/>
+          <circle cx="111" cy="177" r="3" fill="#E8A088"/><circle cx="204" cy="177" r="3" fill="#E8A088"/>
+          <path d="M23 118c32-11 44-30 62-56" stroke="#F3B09A" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 7"/>
+          <circle cx="23" cy="118" r="4" fill="#F3B09A"/>
         </svg>
-        <div class="hero-eyebrow" data-i18n="heroEyebrow">Nice · Cannes · Monaco</div>
-        <h1 data-i18n="heroTitle">Votre chauffeur privé sur toute la Côte d'Azur</h1>
-        <p data-i18n="heroText">Ponctualité, discrétion et véhicules premium. Réservez votre trajet en quelques instants.</p>
-        <button class="btn" data-i18n="heroBtn" onclick="goTo('reserver')">Réserver un trajet</button>
+        <div class="hero-eyebrow" data-i18n="heroEyebrow">Transferts privés · Côte d'Azur</div>
+        <h1 data-i18n="heroTitle">La Riviera, à votre rythme.</h1>
+        <p data-i18n="heroText">Un chauffeur privé, un trajet sans stress. Nice, Cannes, Monaco et toute la région.</p>
+        <div class="hero-promo" id="home-welcome-offer">
+          <span class="hero-promo-rate">−15%</span>
+          <span class="hero-promo-copy"><strong data-i18n="homeOfferTitle">Offre de bienvenue</strong><small data-i18n="homeOfferSub">Sur votre première réservation</small></span>
+        </div>
+        <button class="btn" data-i18n="heroBtn" onclick="planAirportTransfer()">Planifier mon trajet <span aria-hidden="true">→</span></button>
       </div>
 
       <div class="airport-planner-card">
@@ -846,10 +840,12 @@
   const translations = {
     fr: {
       badge24: "24/7",
-      heroEyebrow: "Nice · Cannes · Monaco",
-      heroTitle: "Votre chauffeur privé sur toute la Côte d'Azur",
-      heroText: "Ponctualité, discrétion et véhicules premium. Réservez votre trajet en quelques instants.",
-      heroBtn: "Réserver un trajet",
+      heroEyebrow: "Transferts privés · Côte d'Azur",
+      heroTitle: "La Riviera, à votre rythme.",
+      heroText: "Un chauffeur privé, un trajet sans stress. Nice, Cannes, Monaco et toute la région.",
+      homeOfferTitle: "Offre de bienvenue",
+      homeOfferSub: "Sur votre première réservation",
+      heroBtn: "Planifier mon trajet  →",
       homeAllServices: "Découvrir nos services",
       homeAllRates: "Voir les tarifs",
       airportPlannerTitle: "Planifier votre trajet aéroport",
@@ -954,10 +950,12 @@
     },
     en: {
       badge24: "24/7",
-      heroEyebrow: "Nice · Cannes · Monaco",
-      heroTitle: "Your private chauffeur across the French Riviera",
-      heroText: "Punctuality, discretion and premium vehicles. Book your ride in a few taps.",
-      heroBtn: "Book a ride",
+      heroEyebrow: "Private transfers · French Riviera",
+      heroTitle: "The Riviera, at your pace.",
+      heroText: "Your private chauffeur, a smooth ride. Nice, Cannes, Monaco and beyond.",
+      homeOfferTitle: "Welcome offer",
+      homeOfferSub: "On your first booking",
+      heroBtn: "Plan my ride  →",
       homeAllServices: "Explore our services",
       homeAllRates: "View rates",
       airportPlannerTitle: "Plan your airport transfer",
@@ -1080,6 +1078,8 @@
     });
     document.documentElement.lang = lang;
     updateAirportRoute();
+    const homeOffer=document.getElementById('home-welcome-offer');
+    if(homeOffer) homeOffer.hidden=localStorage.getItem('elitedriver_welcome_offer_used')==='true';
 
     if(pendingTrip){
       const payBtn = document.getElementById('pay-card-btn');
@@ -1207,7 +1207,11 @@
       const savedLang = localStorage.getItem('elitedriver_lang');
       if(saved){
         pendingTrip = JSON.parse(saved);
-        if(pendingTrip.welcomeOffer) localStorage.setItem('elitedriver_welcome_offer_used','true');
+        if(pendingTrip.welcomeOffer){
+          localStorage.setItem('elitedriver_welcome_offer_used','true');
+          const homeOffer=document.getElementById('home-welcome-offer');
+          if(homeOffer) homeOffer.hidden=true;
+        }
         if(savedLang) setLang(savedLang);
         goTo('reserver');
         document.getElementById('booking-form-wrap').style.display = 'none';
