@@ -322,7 +322,16 @@
   .airport-price-card{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 0 16px;padding:14px 15px;border:1px solid var(--line);border-radius:14px;background:var(--paper);}
   .airport-price-label{display:block;color:var(--slate);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
   .airport-route-description{display:block;margin-top:4px;color:var(--ink);font:500 12px 'Poppins',sans-serif;}
-  .airport-price-card strong{flex-shrink:0;color:var(--azure-deep);font:700 20px 'Poppins',sans-serif;}
+  .airport-price-values{display:flex;align-items:flex-end;gap:8px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+  .airport-price-card strong{color:var(--azure-deep);font:700 20px 'Poppins',sans-serif;}
+  .airport-price-original{color:var(--slate);font:500 12px 'Poppins',sans-serif;text-decoration:line-through;}
+  .welcome-offer-banner{display:flex;align-items:center;gap:8px;margin:-6px 0 16px;padding:10px 12px;border:1px solid rgba(217,119,87,.25);border-radius:12px;background:rgba(217,119,87,.09);color:#a8462f;font:600 11.5px 'Poppins',sans-serif;line-height:1.4;}
+  .welcome-offer-banner[hidden]{display:none;}
+  .pay-original-line{display:none;justify-content:space-between;margin:0 0 7px;color:var(--slate);font-size:12px;}
+  .pay-original-line.visible{display:flex;}
+  .pay-original-line s{font-weight:500;}
+  .pay-discount-line{display:none;justify-content:space-between;margin:0 0 10px;color:#a8462f;font-size:12px;font-weight:700;}
+  .pay-discount-line.visible{display:flex;}
 
   .segmented{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
   .seg-btn{
@@ -656,8 +665,10 @@
         <input type="hidden" id="f-route" value="">
         <div class="airport-price-card" aria-live="polite">
           <div><span class="airport-price-label" data-i18n="airportFareLabel">Tarif fixe</span><span class="airport-route-description" id="airport-route-description" data-i18n="airportFareHint">Choisissez un départ pour afficher votre trajet.</span></div>
-          <strong id="airport-route-price">—</strong>
-        </div><div class="row2">
+          <div class="airport-price-values"><span class="airport-price-original" id="airport-route-price-original" hidden></span><strong id="airport-route-price">—</strong></div>
+        </div>
+        <div class="welcome-offer-banner" id="welcome-offer-banner" hidden aria-live="polite"><span aria-hidden="true">🏷️</span><span data-i18n="welcomeOffer">Offre première réservation : 15 % de remise sur ce trajet.</span></div>
+        <div class="row2">
           <div class="field"><label data-i18n="lblDate">Date</label><input type="date" id="f-date" required></div>
           <div class="field"><label data-i18n="lblHeure">Heure</label><input type="time" id="f-heure" required></div>
         </div>
@@ -693,6 +704,8 @@
         <div class="stepper-dots"><span class="done"></span><span class="done"></span></div>
 
         <div class="pay-summary">
+          <div class="pay-original-line" id="pay-original-line"><span data-i18n="payOriginalFare">Tarif initial</span><s id="pay-original-amount"></s></div>
+          <div class="pay-discount-line" id="pay-discount-line"><span data-i18n="payWelcomeDiscount">Remise nouveau client −15 %</span><span id="pay-discount-amount"></span></div>
           <div class="pay-summary-row">
             <span data-i18n="payDepositLabel">Acompte à régler</span>
             <span class="pay-amount" id="pay-amount">45 €</span>
@@ -853,6 +866,9 @@
       airportStTropez: "Saint-Tropez",
       airportFareLabel: "Tarif fixe",
       airportFareHint: "Choisissez un départ pour afficher votre trajet.",
+      welcomeOffer: "Offre première réservation sur cet appareil : 15 % de remise.",
+      payOriginalFare: "Tarif initial",
+      payWelcomeDiscount: "Remise première réservation −15 %",
       airportFareAirport: "Transfert vers l’aéroport de Nice",
       airportFareStTropez: "Transfert vers Saint-Tropez",
       chip1n: "24h/24", chip1l: "7j/7 sur réservation",
@@ -958,6 +974,9 @@
       airportStTropez: "Saint-Tropez",
       airportFareLabel: "Fixed fare",
       airportFareHint: "Choose a pickup to see your route.",
+      welcomeOffer: "First booking on this device: 15% off.",
+      payOriginalFare: "Original fare",
+      payWelcomeDiscount: "First booking discount −15%",
       airportFareAirport: "Transfer to Nice Airport",
       airportFareStTropez: "Transfer to Saint-Tropez",
       chip1n: "24/7", chip1l: "By reservation",
@@ -1104,6 +1123,8 @@
     const destination=document.getElementById('f-arrivee');
     const route=document.getElementById('f-route');
     const price=document.getElementById('airport-route-price');
+    const originalPrice=document.getElementById('airport-route-price-original');
+    const offerBanner=document.getElementById('welcome-offer-banner');
     const description=document.getElementById('airport-route-description');
     if(!origin||!destination||!route||!price||!description) return;
     const selectedDestination=origin.value==='Aéroport de Nice'?'Saint-Tropez':'Aéroport de Nice';
@@ -1128,13 +1149,20 @@
       'Aéroport de Nice|Saint-Tropez':280
     };
     const amount=prices[origin.value+'|'+destination.value];
+    const offerAvailable=localStorage.getItem('elitedriver_welcome_offer_used')!=='true';
     if(amount){
+      const discounted=Math.round(amount*0.85*100)/100;
       route.value=origin.value+'|'+destination.value+'|'+amount;
-      price.textContent=amount+' €';
+      price.textContent=(offerAvailable?discounted:amount).toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:offerAvailable?2:0,maximumFractionDigits:2})+' €';
+      originalPrice.hidden=!offerAvailable;
+      originalPrice.textContent=offerAvailable?amount+' €':'';
+      offerBanner.hidden=!offerAvailable;
       description.textContent=airportLocationLabel(origin.value)+' → '+airportLocationLabel(destination.value);
     }else{
       route.value='';
       price.textContent='—';
+      originalPrice.hidden=true;
+      offerBanner.hidden=true;
       description.textContent=translations[currentLang].airportFareHint;
     }
   }
@@ -1179,6 +1207,7 @@
       const savedLang = localStorage.getItem('elitedriver_lang');
       if(saved){
         pendingTrip = JSON.parse(saved);
+        if(pendingTrip.welcomeOffer) localStorage.setItem('elitedriver_welcome_offer_used','true');
         if(savedLang) setLang(savedLang);
         goTo('reserver');
         document.getElementById('booking-form-wrap').style.display = 'none';
@@ -1211,10 +1240,13 @@
       return;
     }
     const service = translations[currentLang].airportServiceName;
-    const amount = routePrice;
+    const baseAmount = Number(routePrice);
+    const welcomeOffer = localStorage.getItem('elitedriver_welcome_offer_used')!=='true';
+    const amount = welcomeOffer ? Math.round(baseAmount*0.85*100)/100 : baseAmount;
+    const discountAmount = Math.round((baseAmount-amount)*100)/100;
     const ref = 'EDAR-' + Math.floor(1000 + Math.random()*9000);
 
-    pendingTrip = { nom, depart, arrivee, date, heure, tel, service, amount, ref };
+    pendingTrip = { nom, depart, arrivee, date, heure, tel, service, amount, baseAmount, discountAmount, welcomeOffer, ref };
 
     document.getElementById('booking-title').textContent = dict.paymentTitle;
     document.getElementById('booking-sub').textContent = dict.paymentSub;
@@ -1222,9 +1254,13 @@
 
     const payEl = document.getElementById('booking-payment');
     payEl.style.display = 'block';
-    document.getElementById('pay-amount').textContent = amount + ' €';
+    document.getElementById('pay-amount').textContent = amount.toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+    document.getElementById('pay-original-line').classList.toggle('visible',welcomeOffer);
+    document.getElementById('pay-discount-line').classList.toggle('visible',welcomeOffer);
+    document.getElementById('pay-original-amount').textContent = baseAmount.toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+    document.getElementById('pay-discount-amount').textContent = '−'+discountAmount.toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
     const payBtn = document.getElementById('pay-card-btn');
-    payBtn.textContent = (currentLang === 'fr' ? 'Payer ' : 'Pay ') + amount + ' €';
+    payBtn.textContent = (currentLang === 'fr' ? 'Payer ' : 'Pay ') + document.getElementById('pay-amount').textContent;
   }
 
   function backToForm(){
