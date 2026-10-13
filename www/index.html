@@ -538,6 +538,10 @@
   .notch {
     display: none;
   }
+.music-toggle{display:flex;align-items:center;justify-content:center;gap:7px;margin:9px auto 0;padding:6px 11px;border:1px solid rgba(255,255,255,.34);border-radius:99px;background:rgba(10,30,40,.26);color:#fffdf8;font:500 10.5px 'Poppins',sans-serif;cursor:pointer;}
+  .music-toggle span:first-child{font-size:14px;color:#f2b09a;}
+  .music-toggle[aria-pressed="true"]{background:rgba(255,255,255,.18);}
+  .music-toggle:focus-visible{outline:2px solid #f2b09a;outline-offset:3px;}
 </style>
 </head>
 <body>
@@ -580,6 +584,8 @@
           <span class="hero-promo-copy"><strong data-i18n="homeOfferTitle">Offre de bienvenue</strong><small data-i18n="homeOfferSub">Sur votre première réservation</small></span>
         </div>
         <button class="btn" data-i18n="heroBtn" onclick="planAirportTransfer()">Planifier mon trajet <span aria-hidden="true">→</span></button>
+        <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" onclick="toggleWelcomeMusic()"><span aria-hidden="true">♫</span><span data-i18n="musicPlay">Écouter la musique</span></button>
+        <audio id="welcome-music" src="ambiance-elite-driver-originale.wav" loop preload="none"></audio>
       </div>
 
       <div class="airport-planner-card">
@@ -852,6 +858,8 @@
       homeOfferTitle: "Offre de bienvenue",
       homeOfferSub: "Sur votre première réservation",
       heroBtn: "Planifier mon trajet  →",
+      musicPlay: "Écouter la musique",
+      musicPause: "Mettre en pause",
       homeAllServices: "Découvrir nos services",
       homeAllRates: "Voir les tarifs",
       airportPlannerTitle: "Planifier votre trajet aéroport",
@@ -971,6 +979,8 @@
       homeOfferTitle: "Welcome offer",
       homeOfferSub: "On your first booking",
       heroBtn: "Plan my ride  →",
+      musicPlay: "Play the music",
+      musicPause: "Pause the music",
       homeAllServices: "Explore our services",
       homeAllRates: "View rates",
       airportPlannerTitle: "Plan your airport transfer",
@@ -1102,6 +1112,7 @@
     });
     document.documentElement.lang = lang;
     updateAirportRoute();
+    updateMusicButton();
     const homeOffer=document.getElementById('home-welcome-offer');
     if(homeOffer) homeOffer.hidden=localStorage.getItem('elitedriver_welcome_offer_used')==='true';
 
@@ -1220,6 +1231,22 @@
       offerBanner.hidden=true;
       description.textContent=translations[currentLang].airportFareHint;
     }
+  }
+
+  function updateMusicButton(){
+    const button=document.getElementById('music-toggle');
+    const audio=document.getElementById('welcome-music');
+    if(!button||!audio) return;
+    button.setAttribute('aria-pressed',String(!audio.paused));
+    const label=button.querySelector('[data-i18n="musicPlay"]');
+    if(label) label.textContent=translations[currentLang][audio.paused?'musicPlay':'musicPause'];
+  }
+
+  async function toggleWelcomeMusic(){
+    const audio=document.getElementById('welcome-music');
+    if(!audio) return;
+    try{if(audio.paused) await audio.play(); else audio.pause();}catch(error){showToast(currentLang==='fr'?'La musique n’a pas pu démarrer. Réessayez.':'Music could not start. Please try again.');}
+    updateMusicButton();
   }
 
   function planAirportTransfer(){
