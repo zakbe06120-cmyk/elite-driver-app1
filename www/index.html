@@ -642,6 +642,7 @@
               <option value="Villefranche-sur-Mer" data-i18n="airportOriginVillefranche">Villefranche-sur-Mer</option>
               <option value="Monaco" data-i18n="airportOriginMonaco">Monaco</option>
               <option value="Aéroport de Nice" data-i18n="airportNice">Aéroport de Nice</option>
+              <option value="__other__" data-i18n="airportOther">Autre ville / adresse</option>
             </select>
           </div>
           <div class="field">
@@ -650,6 +651,14 @@
               <option value="" data-i18n="airportDestinationPlaceholder">Choisir la destination</option>
             </select>
           </div>
+        </div>
+        <div class="field airport-custom-field" id="other-origin-field" hidden>
+          <label for="f-depart-other" data-i18n="airportOtherOriginLabel">Votre ville ou adresse de départ</label>
+          <input type="text" id="f-depart-other" data-i18n-ph="airportOtherPlaceholder" placeholder="Saisissez une ville ou une adresse" autocomplete="street-address" oninput="updateAirportRoute()">
+        </div>
+        <div class="field airport-custom-field" id="other-destination-field" hidden>
+          <label for="f-arrivee-other" data-i18n="airportOtherDestinationLabel">Votre destination</label>
+          <input type="text" id="f-arrivee-other" data-i18n-ph="airportOtherDestinationPlaceholder" placeholder="Saisissez une ville ou une adresse" autocomplete="street-address" oninput="updateAirportRoute()">
         </div>
         <input type="hidden" id="f-route" value="">
         <div class="airport-price-card" aria-live="polite">
@@ -685,7 +694,7 @@
           <textarea id="f-message" data-i18n-ph="phMessage" placeholder="Ex : vol AF1234, siège bébé souhaité…"></textarea>
         </div>
 
-        <div class="step-actions"><button class="btn btn-ghost" type="button" onclick="previousBookingStep()" data-i18n="backBooking">← Retour</button><button class="btn" data-i18n="btnSubmit" onclick="submitBooking()">Continuer</button></div>
+        <div class="step-actions"><button class="btn btn-ghost" type="button" onclick="previousBookingStep()" data-i18n="backBooking">← Retour</button><button class="btn" id="booking-submit" data-i18n="btnSubmit" onclick="submitBooking()">Continuer</button></div>
         </div>
       </div>
 
@@ -859,6 +868,14 @@
       airportStTropez: "Saint-Tropez",
       airportFareLabel: "Tarif fixe",
       airportFareHint: "Choisissez un départ pour afficher votre trajet.",
+      airportOther: "Autre ville / adresse",
+      airportOtherOriginLabel: "Votre ville ou adresse de départ",
+      airportOtherDestinationLabel: "Votre destination",
+      airportOtherPlaceholder: "Saisissez une ville ou une adresse",
+      airportOtherDestinationPlaceholder: "Saisissez une ville ou une adresse",
+      airportOnQuote: "Sur devis",
+      btnQuoteSubmit: "Demander mon devis sur WhatsApp",
+      toastOtherLocationMissing: "Indiquez votre ville ou adresse pour continuer.",
       welcomeOffer: "Offre première réservation sur cet appareil : 15 % de remise.",
       payOriginalFare: "Tarif initial",
       payWelcomeDiscount: "Remise première réservation −15 %",
@@ -882,7 +899,7 @@
       quote1: "\u201CService d'une qualité exceptionnelle. Ponctualité, confort et professionnalisme irréprochable.\u201D",
       quote1who: "— Stéphane L., client satisfait",
       bookTitle: "Planifier votre trajet aéroport",
-      bookSub: "Indiquez votre départ et votre horaire. Le tarif s’affiche avant de continuer.",
+      bookSub: "Choisissez un lieu proposé ou saisissez une autre adresse.",
       bookingIntroTitle: "Transfert aéroport, tarif annoncé avant la réservation",
       bookingIntroSub: "Choisissez votre point de départ pour commencer.",
       bookingStep1Title: "Votre trajet aéroport",
@@ -969,6 +986,14 @@
       airportStTropez: "Saint-Tropez",
       airportFareLabel: "Fixed fare",
       airportFareHint: "Choose a pickup to see your route.",
+      airportOther: "Other town / address",
+      airportOtherOriginLabel: "Your pickup town or address",
+      airportOtherDestinationLabel: "Your destination",
+      airportOtherPlaceholder: "Enter a town or address",
+      airportOtherDestinationPlaceholder: "Enter a town or address",
+      airportOnQuote: "Quote required",
+      btnQuoteSubmit: "Request a quote on WhatsApp",
+      toastOtherLocationMissing: "Enter your town or address to continue.",
       welcomeOffer: "First booking on this device: 15% off.",
       payOriginalFare: "Original fare",
       payWelcomeDiscount: "First booking discount −15%",
@@ -992,7 +1017,7 @@
       quote1: "\u201CExceptional quality of service. Punctuality, comfort and flawless professionalism.\u201D",
       quote1who: "— Stéphane L., satisfied client",
       bookTitle: "Plan your airport transfer",
-      bookSub: "Choose your pickup and time. See the fare before continuing.",
+      bookSub: "Choose a suggested location or enter another address.",
       bookingIntroTitle: "Airport transfer with upfront fare",
       bookingIntroSub: "Choose your pickup location to get started.",
       bookingStep1Title: "Your airport transfer",
@@ -1110,7 +1135,8 @@
     const key={
       'Aéroport de Nice':'airportNice','Saint-Tropez':'airportStTropez',
       'Saint-Jean-Cap-Ferrat':'airportOriginSjf','Beaulieu-sur-Mer':'airportOriginBeaulieu',
-      'Villefranche-sur-Mer':'airportOriginVillefranche','Monaco':'airportOriginMonaco'
+      'Villefranche-sur-Mer':'airportOriginVillefranche','Monaco':'airportOriginMonaco',
+      '__other__':'airportOther'
     }[location];
     return key ? translations[currentLang][key] : location;
   }
@@ -1124,6 +1150,9 @@
     const offerBanner=document.getElementById('welcome-offer-banner');
     const description=document.getElementById('airport-route-description');
     if(!origin||!destination||!route||!price||!description) return;
+
+    const originChanged=destination.dataset.origin!==origin.value;
+    const previousDestination=destination.value;
     const selectedDestination=origin.value==='Aéroport de Nice'?'Saint-Tropez':'Aéroport de Nice';
     destination.disabled=!origin.value;
     destination.innerHTML='';
@@ -1136,8 +1165,21 @@
       option.value=selectedDestination;
       option.textContent=airportLocationLabel(selectedDestination);
       destination.appendChild(option);
-      destination.value=selectedDestination;
+      const otherOption=document.createElement('option');
+      otherOption.value='__other__';
+      otherOption.textContent=translations[currentLang].airportOther;
+      destination.appendChild(otherOption);
+      destination.value=!originChanged&&(previousDestination===selectedDestination||previousDestination==='__other__')?previousDestination:selectedDestination;
     }
+    destination.dataset.origin=origin.value;
+
+    const originIsOther=origin.value==='__other__';
+    const destinationIsOther=destination.value==='__other__';
+    document.getElementById('other-origin-field').hidden=!originIsOther;
+    document.getElementById('other-destination-field').hidden=!destinationIsOther;
+    const originValue=originIsOther?document.getElementById('f-depart-other').value.trim():origin.value;
+    const destinationValue=destinationIsOther?document.getElementById('f-arrivee-other').value.trim():destination.value;
+
     const prices={
       'Saint-Jean-Cap-Ferrat|Aéroport de Nice':70,
       'Beaulieu-sur-Mer|Aéroport de Nice':70,
@@ -1147,16 +1189,26 @@
     };
     const amount=prices[origin.value+'|'+destination.value];
     const offerAvailable=localStorage.getItem('elitedriver_welcome_offer_used')!=='true';
+    const submitButton=document.getElementById('booking-submit');
+    const hasRoute=Boolean(origin.value&&destination.value);
+    route.value=hasRoute?origin.value+'|'+destination.value+'|'+(amount||'quote'):'';
+    if(submitButton) submitButton.textContent=translations[currentLang][hasRoute&&!amount?'btnQuoteSubmit':'btnSubmit'];
+
     if(amount){
       const discounted=Math.round(amount*0.85*100)/100;
-      route.value=origin.value+'|'+destination.value+'|'+amount;
       price.textContent=(offerAvailable?discounted:amount).toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:offerAvailable?2:0,maximumFractionDigits:2})+' €';
       originalPrice.hidden=!offerAvailable;
       originalPrice.textContent=offerAvailable?amount+' €':'';
       offerBanner.hidden=!offerAvailable;
       description.textContent=airportLocationLabel(origin.value)+' → '+airportLocationLabel(destination.value);
+    }else if(hasRoute){
+      price.textContent=translations[currentLang].airportOnQuote;
+      originalPrice.hidden=true;
+      offerBanner.hidden=true;
+      const displayedOrigin=originIsOther?(originValue||translations[currentLang].airportOther):airportLocationLabel(origin.value);
+      const displayedDestination=destinationIsOther?(destinationValue||translations[currentLang].airportOther):airportLocationLabel(destination.value);
+      description.textContent=displayedOrigin+' → '+displayedDestination;
     }else{
-      route.value='';
       price.textContent='—';
       originalPrice.hidden=true;
       offerBanner.hidden=true;
@@ -1167,6 +1219,8 @@
   function planAirportTransfer(){
     const origin=document.getElementById('f-depart');
     if(origin) origin.value='';
+    document.getElementById('f-depart-other').value='';
+    document.getElementById('f-arrivee-other').value='';
     document.getElementById('f-date').value='';
     document.getElementById('f-heure').value='';
     setBookingStep(1);
@@ -1185,6 +1239,9 @@
     const route=document.getElementById('f-route').value;
     const date=document.getElementById('f-date').value;
     const time=document.getElementById('f-heure').value;
+    const originOther=document.getElementById('f-depart').value==='__other__';
+    const destinationOther=document.getElementById('f-arrivee').value==='__other__';
+    if((originOther&&!document.getElementById('f-depart-other').value.trim())||(destinationOther&&!document.getElementById('f-arrivee-other').value.trim())){showToast(translations[currentLang].toastOtherLocationMissing);return;}
     if(!route||!date||!time){showToast(translations[currentLang].toastTripMissing);return;}
     const selected=new Date(`${date}T${time}`);
     if(Number.isNaN(selected.getTime())||selected<=new Date()){showToast(translations[currentLang].toastDatePast);return;}
@@ -1231,13 +1288,31 @@
     const dict = translations[currentLang];
     const nom = document.getElementById('f-nom').value.trim();
     const routeVal = document.getElementById('f-route').value;
-    const [depart, arrivee, routePrice] = routeVal.split('|');
+    const [originKey, destinationKey, routePrice] = routeVal.split('|');
+    const depart = originKey==='__other__'?document.getElementById('f-depart-other').value.trim():originKey;
+    const arrivee = destinationKey==='__other__'?document.getElementById('f-arrivee-other').value.trim():destinationKey;
     const date = document.getElementById('f-date').value;
     const heure = document.getElementById('f-heure').value;
     const tel = document.getElementById('f-tel').value.trim();
 
     if(!nom || !depart || !arrivee || !tel){
       showToast(dict.toastMissing);
+      return;
+    }
+    if(routePrice==='quote'){
+      const details=[
+        'Bonjour, je souhaite un devis pour un trajet.',
+        'Départ : '+depart,
+        'Destination : '+arrivee,
+        'Date : '+date+' à '+heure,
+        'Passagers : '+document.getElementById('f-passagers').value,
+        'Bagages : '+document.getElementById('f-bagages').value,
+        'Nom : '+nom,
+        'Téléphone : '+tel,
+        document.getElementById('f-email').value.trim()?'E-mail : '+document.getElementById('f-email').value.trim():'',
+        document.getElementById('f-message').value.trim()?'Précisions : '+document.getElementById('f-message').value.trim():''
+      ].filter(Boolean).join('\n');
+      window.location.href='https://wa.me/33777144250?text='+encodeURIComponent(details);
       return;
     }
     const service = translations[currentLang].airportServiceName;
