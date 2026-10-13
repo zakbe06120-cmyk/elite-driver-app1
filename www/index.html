@@ -538,6 +538,9 @@
   .notch {
     display: none;
   }
+}
+
+/* Accueil : contrôle audio et badge promotionnel compact */
 .music-toggle{display:flex;align-items:center;justify-content:center;gap:7px;margin:9px auto 0;padding:6px 11px;border:1px solid rgba(255,255,255,.34);border-radius:99px;background:rgba(10,30,40,.26);color:#fffdf8;font:500 10.5px 'Poppins',sans-serif;cursor:pointer;}
   .music-toggle span:first-child{font-size:14px;color:#f2b09a;}
   .music-toggle[aria-pressed="true"]{background:rgba(255,255,255,.18);}
@@ -546,15 +549,17 @@
   .hero-promo-rate{display:inline-grid;place-items:center;width:auto;height:auto;padding:3px 6px;border-radius:99px;background:linear-gradient(145deg,#f1ae96,#d97757);color:#192d37;font:700 9px 'Poppins',sans-serif;}
   .hero-promo-copy{font-size:9px;color:rgba(255,253,248,.82);}
   .welcome-offer-banner{margin:0 0 10px;padding:5px 8px;border-radius:8px;font-size:9px;line-height:1.25;}
-  .vehicle-selection{margin:12px 0 14px;padding:0;border:0;min-width:0;}
-  .vehicle-selection legend{margin-bottom:7px;color:var(--slate);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
-  .vehicle-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .vehicle-option{display:flex;align-items:center;gap:8px;min-height:54px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--paper);cursor:pointer;}
+  .vehicle-selection{appearance:none;-webkit-appearance:none;display:block;width:100%;margin:14px 0;padding:0;border:0;min-width:0;}
+  .vehicle-selection legend{display:block;width:100%;margin:0 0 8px;padding:0;color:var(--slate);font:600 10px 'Poppins',sans-serif;letter-spacing:.07em;text-transform:uppercase;}
+  .vehicle-options{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .vehicle-option{display:flex;align-items:center;gap:9px;min-width:0;min-height:62px;padding:10px;border:1px solid var(--line);border-radius:13px;background:var(--paper);cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;}
   .vehicle-option:has(input:checked){border-color:var(--azure);background:rgba(106,155,204,.1);box-shadow:0 0 0 1px rgba(106,155,204,.12);}
-  .vehicle-option input{width:15px;height:15px;margin:0;flex-shrink:0;accent-color:var(--azure-deep);}
+  .vehicle-option input{width:16px;height:16px;margin:0;flex:0 0 16px;accent-color:var(--azure-deep);}
+  .vehicle-option>span{display:block;min-width:0;flex:1;}
   .vehicle-option strong,.vehicle-option small{display:block;}
-  .vehicle-option strong{color:var(--ink);font:600 11px 'Poppins',sans-serif;}
-  .vehicle-option small{margin-top:2px;color:var(--slate);font-size:9px;line-height:1.25;}
+  .vehicle-option strong{color:var(--ink);font:600 11px 'Poppins',sans-serif;line-height:1.35;}
+  .vehicle-option small{margin-top:3px;color:var(--slate);font:400 9px/1.35 'Lora',serif;}
+  @media (max-width: 767px){.row2{grid-template-columns:1fr 1fr;gap:10px;}.row2 .field{min-width:0;}}
   .vehicle-payment-row{margin-bottom:10px;}
 </style>
 </head>
