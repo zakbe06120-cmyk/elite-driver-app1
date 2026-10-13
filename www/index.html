@@ -383,11 +383,17 @@
     background:rgba(184,146,90,0.1); border:1px solid var(--line); border-radius:14px;
     padding:13px 14px; color:var(--slate); font-size:12px; line-height:1.5; margin-top:6px;
   }
-  .whatsapp-card{text-align:center;margin:16px 0;padding:18px 16px;background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 16px rgba(20,20,19,.05);}
-  .whatsapp-qr-frame{width:min(220px,70vw);aspect-ratio:1;margin:0 auto 12px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:14px;}
-  .whatsapp-qr{display:block;width:100%;height:100%;object-fit:contain;}
-  .whatsapp-card p{margin:0 0 14px;color:var(--slate);font-size:12px;line-height:1.45;}
-  .whatsapp-open{display:inline-flex;align-items:center;justify-content:center;padding:11px 18px;border-radius:12px;background:#25D366;color:#102519;text-decoration:none;font:600 13px 'Poppins',sans-serif;}
+  .whatsapp-card{text-align:center;margin:16px 0;padding:27px 18px;background:radial-gradient(circle at 50% 20%,rgba(37,211,102,.1),transparent 60%),var(--paper);border:1px solid var(--line);border-radius:20px;box-shadow:0 8px 22px rgba(20,20,19,.07);}
+  .whatsapp-launch{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--ink);text-decoration:none;}
+  .whatsapp-launch:focus-visible{outline:3px solid #25D366;outline-offset:6px;border-radius:18px;}
+  .whatsapp-launch-icon{position:relative;display:grid;place-items:center;width:112px;height:112px;margin:7px 0 5px;border-radius:50%;background:linear-gradient(145deg,#35e47a,#18b957);color:#fff;box-shadow:0 0 0 8px rgba(37,211,102,.1),0 0 26px rgba(37,211,102,.55),inset 0 1px 2px rgba(255,255,255,.35);}
+  .whatsapp-launch-icon::before,.whatsapp-launch-icon::after{content:'';position:absolute;inset:-8px;border:2px solid rgba(37,211,102,.4);border-radius:50%;animation:whatsapp-pulse 2.2s ease-out infinite;}
+  .whatsapp-launch-icon::after{animation-delay:1.1s;}
+  .whatsapp-launch-icon svg{position:relative;z-index:1;width:48px;height:48px;}
+  .whatsapp-launch-title{font:600 14px 'Poppins',sans-serif;}
+  .whatsapp-launch-hint{max-width:250px;color:var(--slate);font-size:11.5px;line-height:1.5;}
+  @keyframes whatsapp-pulse{0%{transform:scale(.88);opacity:.75;}100%{transform:scale(1.45);opacity:0;}}
+  @media (prefers-reduced-motion:reduce){.whatsapp-launch-icon::before,.whatsapp-launch-icon::after{animation:none;}}
   .contact-row{ display:flex; gap:12px; align-items:center; padding:14px 4px; border-bottom:1px solid var(--line); }
   .contact-row:last-child{ border-bottom:none; }
   .contact-link{display:block;color:inherit;text-decoration:none;}
@@ -779,11 +785,13 @@
       <div class="screen-sub" data-i18n="contactSub">Scannez le code pour démarrer une discussion avec Elite.</div>
 
       <div class="whatsapp-card">
-        <div class="whatsapp-qr-frame">
-          <img class="whatsapp-qr" src="data:image/png;base64,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" alt="QR code WhatsApp Elite">
-        </div>
-        <p data-i18n="whatsappScan">Scannez ce code pour démarrer une discussion WhatsApp avec Elite.</p>
-        <a class="whatsapp-open" href="https://wa.me/33777144250" target="_blank" rel="noopener" data-i18n="whatsappOpen">Ouvrir WhatsApp</a>
+        <a class="whatsapp-launch" href="https://wa.me/33777144250?text=Bonjour%2C%20je%20souhaite%20r%C3%A9server%20un%20trajet.">
+          <span class="whatsapp-launch-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20l1.3-5.2A8.4 8.4 0 1 1 21 11.5Z"/><path d="M9.2 9.1c.2 1.6 2.2 3.7 3.8 4l1.2-1 2.1 1.1-.4 1.8c-.2.6-.8.9-1.4.8-3.6-.7-6.8-3.8-7.5-7.4-.1-.6.2-1.2.8-1.4l1.8-.4 1.1 2.1-1.5 1.4Z"/></svg>
+          </span>
+          <strong class="whatsapp-launch-title" data-i18n="whatsappTap">Touchez pour ouvrir WhatsApp</strong>
+          <span class="whatsapp-launch-hint" data-i18n="whatsappHint">L’application s’ouvrira automatiquement si elle est installée.</span>
+        </a>
       </div>
 
       <div class="map-box" data-i18n="mapLabel">📍 Cagnes-sur-Mer, Côte d'Azur</div>
@@ -907,8 +915,8 @@
       pricingNote: "Ces montants sont des exemples à remplacer par votre grille tarifaire réelle. Le calcul automatique du prix (distance, horaires de nuit, majorations) peut être branché à votre moteur de tarification.",
       btnQuotePrecise: "Obtenir un devis précis",
       contactTitle: "WhatsApp et contact",
-      whatsappScan: "Scannez ce code pour démarrer une discussion WhatsApp avec Elite.",
-      whatsappOpen: "Ouvrir WhatsApp",
+      whatsappTap: "Touchez pour ouvrir WhatsApp",
+      whatsappHint: "L’application s’ouvrira automatiquement si elle est installée.",
       contactSub: "Passage du Moulin, 06800 Cagnes-sur-Mer, France",
       mapLabel: "📍 Cagnes-sur-Mer, Côte d'Azur",
       contactPhoneH: "Téléphone", contactPhoneP: "+33 7 77 14 42 50",
@@ -1017,8 +1025,8 @@
       pricingNote: "These amounts are examples to replace with your actual pricing grid. Automatic price calculation (distance, night surcharges, fees) can be connected to your pricing engine.",
       btnQuotePrecise: "Get an accurate quote",
       contactTitle: "WhatsApp and contact",
-      whatsappScan: "Scan this code to start a WhatsApp chat with Elite.",
-      whatsappOpen: "Open WhatsApp",
+      whatsappTap: "Tap to open WhatsApp",
+      whatsappHint: "WhatsApp will open automatically if installed.",
       contactSub: "Passage du Moulin, 06800 Cagnes-sur-Mer, France",
       mapLabel: "📍 Cagnes-sur-Mer, French Riviera",
       contactPhoneH: "Phone", contactPhoneP: "+33 7 77 14 42 50",
