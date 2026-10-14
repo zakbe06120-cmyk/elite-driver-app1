@@ -55,3 +55,90 @@ workflows:
         auth: integration
         submit_to_testflight: true
         submit_to_app_store: false
+  android-elite-driver:
+    name: Elite Driver Azur Riviera - Android
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      android_signing:
+        - elite-driver-android-upload
+      groups:
+        - google_play_credentials
+      vars:
+        PACKAGE_NAME: "com.elitedriverazurriviera.app"
+      node: 18
+    scripts:
+      - name: Install npm dependencies
+        script: npm install
+      - name: Add Android platform
+        script: npx cap add android || true
+      - name: Sync web assets into Android project
+        script: npx cap sync android
+      - name: Configure Android API, version and release signing
+        script: |
+          export APP_VERSION="$(node -p 'require("./package.json").version')"
+          export BUILD_NUMBER="$(date +%s)"
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          variables = Path("android/variables.gradle")
+          content = variables.read_text()
+          content, sdk_count = re.subn(r"compileSdkVersion\s*=\s*\d+", "compileSdkVersion = 36", content, count=1)
+          content, target_count = re.subn(r"targetSdkVersion\s*=\s*\d+", "targetSdkVersion = 36", content, count=1)
+          if not sdk_count or not target_count:
+              raise SystemExit("Impossible de mettre à jour compileSdkVersion/targetSdkVersion dans android/variables.gradle")
+          variables.write_text(content)
+
+          root_gradle = Path("android/build.gradle")
+          content = root_gradle.read_text()
+          content, agp_count = re.subn(r"com\.android\.tools\.build:gradle:[0-9.]+", "com.android.tools.build:gradle:8.9.1", content, count=1)
+          if not agp_count:
+              raise SystemExit("Version Android Gradle Plugin introuvable dans android/build.gradle")
+          root_gradle.write_text(content)
+
+          wrapper = Path("android/gradle/wrapper/gradle-wrapper.properties")
+          content = wrapper.read_text()
+          content, wrapper_count = re.subn(r"gradle-[0-9.]+-all\.zip", "gradle-8.11.1-all.zip", content, count=1)
+          if not wrapper_count:
+              raise SystemExit("URL Gradle Wrapper introuvable")
+          wrapper.write_text(content)
+
+          app_gradle = Path("android/app/build.gradle")
+          content = app_gradle.read_text()
+          signing = """    signingConfigs {
+                  release {
+                      storeFile file(System.getenv("CM_KEYSTORE_PATH"))
+                      storePassword System.getenv("CM_KEYSTORE_PASSWORD")
+                      keyAlias System.getenv("CM_KEY_ALIAS")
+                      keyPassword System.getenv("CM_KEY_PASSWORD")
+                  }
+              }
+
+          """
+          content, android_count = re.subn(r"(android\s*\{)", r"\1\n" + signing.rstrip(), content, count=1)
+          if not android_count:
+              raise SystemExit("Bloc android introuvable dans android/app/build.gradle")
+          content, release_count = re.subn(r"(buildTypes\s*\{\s*release\s*\{)", r"\1\n            signingConfig signingConfigs.release", content, count=1)
+          if not release_count:
+              raise SystemExit("Bloc buildTypes.release introuvable dans android/app/build.gradle")
+          content, code_count = re.subn(r"versionCode\s+\d+", "versionCode " + os.environ["BUILD_NUMBER"], content, count=1)
+          content, name_count = re.subn(r'versionName\s+"[^"]+"', 'versionName "' + os.environ["APP_VERSION"] + '"', content, count=1)
+          if not code_count or not name_count:
+              raise SystemExit("Version Android introuvable dans android/app/build.gradle")
+          app_gradle.write_text(content)
+          PY
+      - name: Build signed Android App Bundle
+        script: |
+          cd android
+          ./gradlew bundleRelease
+    artifacts:
+      - android/app/build/outputs/bundle/release/*.aab
+      - android/app/build/outputs/mapping/release/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: true
+
