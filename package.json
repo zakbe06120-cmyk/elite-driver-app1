@@ -2,14 +2,18 @@
   "name": "elite-driver-azur-riviera",
   "version": "1.0.1",
   "private": true,
-  "description": "App iOS Elite Driver Azur Riviera (chauffeur privé VTC Côte d'Azur)",
+  "description": "Application Elite Driver Azur Riviera (chauffeur privé VTC Côte d'Azur)",
   "scripts": {
-    "sync": "npx cap sync ios",
-    "open:ios": "npx cap open ios"
+    "sync": "npx cap sync",
+    "sync:ios": "npx cap sync ios",
+    "sync:android": "npx cap sync android",
+    "open:ios": "npx cap open ios",
+    "open:android": "npx cap open android"
   },
   "dependencies": {
     "@capacitor/core": "^6.1.0",
-    "@capacitor/ios": "^6.1.0"
+    "@capacitor/ios": "^6.1.0",
+    "@capacitor/android": "^6.1.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.0"
