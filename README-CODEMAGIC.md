@@ -68,3 +68,20 @@ Le workflow `codemagic.yaml` a `submit_to_app_store: false` par défaut pour vou
 
 - Apple Developer Program : 99 $/an (obligatoire)
 - Codemagic : gratuit jusqu'à 500 minutes de build/mois, largement suffisant pour ce projet
+
+## Ajouter la version Android sur Google Play
+
+Le workflow Codemagic `android-elite-driver` génère un Android App Bundle signé et l’envoie au test interne Google Play. Le premier lancement se fait manuellement depuis Codemagic.
+
+### Prérequis Google Play
+
+1. Créez votre compte développeur sur [Google Play Console](https://play.google.com/console/signup), terminez la vérification d’identité et créez l’application **Elite Driver Azur Riviera**.
+2. Conservez l’identifiant d’application `com.elitedriverazurriviera.app`. Il doit rester identique à celui d’iOS dans `capacitor.config.json`.
+3. Dans Codemagic, ajoutez une clé Android dans **Team settings → Code signing identities → Android keystores** avec le nom de référence `elite-driver-android-upload`. Gardez une copie du fichier de clé et de ses mots de passe dans un endroit sûr : les mises à jour doivent garder la même clé.
+4. Dans Google Play Console, configurez l’accès API/service account, puis ajoutez à Codemagic le JSON du compte de service comme variable secrète `GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS`, dans le groupe `google_play_credentials`.
+5. Lancez le workflow `android-elite-driver` dans Codemagic. Le bundle sera téléversé sur le canal **test interne** en brouillon.
+6. Complétez la fiche Play Store et les déclarations de contenu, puis publiez le test interne depuis Play Console.
+
+Le workflow cible l’API Android 36, requise par Google Play pour les nouvelles applications et mises à jour à partir du 31 août 2026. Il n’est pas configuré pour publier directement en production.
+
+Si le compte développeur Google est un compte personnel créé après le 13 novembre 2023, Google exige un test fermé avec au moins 12 testeurs inscrits pendant 14 jours consécutifs avant de demander l’accès à la production.
