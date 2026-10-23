@@ -1290,27 +1290,70 @@
   function previousBookingStep(){setBookingStep(1);}
 
   let pendingTrip = null;
-  window.addEventListener('DOMContentLoaded', () => {
+  function paymentApiBase(){
+    return window.location.hostname.endsWith('.vercel.app')
+      ? window.location.origin + '/api'
+      : 'https://elite-driver-app1.vercel.app/api';
+  }
+
+  async function restoreTripFromCheckout(sessionId){
+    const response=await fetch(paymentApiBase()+'/verify-checkout-session?session_id='+encodeURIComponent(sessionId));
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.trip) throw new Error(data.error||'Impossible de vérifier le paiement.');
+    return data;
+  }
+
+  window.addEventListener('DOMContentLoaded', async () => {
     const dateInput=document.getElementById('f-date');
     if(dateInput) dateInput.min=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
     updateAirportRoute();
-    const params = new URLSearchParams(window.location.search);
-    if(params.get('payment') === 'success'){
-      const saved = localStorage.getItem('elitedriver_pending_trip');
-      const savedLang = localStorage.getItem('elitedriver_lang');
-      if(saved){
-        pendingTrip = JSON.parse(saved);
-        if(pendingTrip.welcomeOffer){
-          localStorage.setItem('elitedriver_welcome_offer_used','true');
-          const homeOffer=document.getElementById('home-welcome-offer');
-          if(homeOffer) homeOffer.hidden=true;
+
+    const params=new URLSearchParams(window.location.search);
+    const paymentStatus=params.get('payment');
+    const sessionId=params.get('session_id');
+    if((paymentStatus==='success'||paymentStatus==='cancelled')&&sessionId){
+      try{
+        const result=await restoreTripFromCheckout(sessionId);
+        const trip=result.trip;
+        pendingTrip={
+          nom:'',
+          depart:trip.depart,
+          arrivee:trip.arrivee,
+          date:trip.date,
+          heure:trip.heure,
+          service:trip.service,
+          vehicleType:trip.vehicleType,
+          amount:trip.amount,
+          baseAmount:trip.baseAmount,
+          discountAmount:trip.discountAmount,
+          welcomeOffer:trip.welcomeOffer,
+          ref:trip.ref
+        };
+        if(trip.lang) setLang(trip.lang);
+
+        if(paymentStatus==='success'&&result.paid){
+          if(pendingTrip.welcomeOffer){
+            localStorage.setItem('elitedriver_welcome_offer_used','true');
+            const homeOffer=document.getElementById('home-welcome-offer');
+            if(homeOffer) homeOffer.hidden=true;
+          }
+          goTo('reserver');
+          document.getElementById('booking-form-wrap').style.display='none';
+          showBookingConfirmation();
+          localStorage.removeItem('elitedriver_pending_trip');
+        }else{
+          document.getElementById('booking-title').textContent=translations[currentLang].paymentTitle;
+          document.getElementById('booking-sub').textContent=translations[currentLang].paymentSub;
+          document.getElementById('booking-form-wrap').style.display='none';
+          document.getElementById('booking-payment').style.display='block';
+          document.getElementById('pay-amount').textContent=Number(trip.amount).toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+          goTo('reserver');
+          showToast(currentLang==='fr'?'Paiement annulé. Vous pouvez réessayer.':'Payment cancelled. You can try again.');
         }
-        if(savedLang) setLang(savedLang);
-        goTo('reserver');
-        document.getElementById('booking-form-wrap').style.display = 'none';
-        showBookingConfirmation();
-        localStorage.removeItem('elitedriver_pending_trip');
+      }catch(error){
+        showToast(error.message||'Impossible de vérifier le paiement.');
       }
+      window.history.replaceState({},'',window.location.pathname);
     }
   });
   function formatCardNumber(el){
@@ -1402,7 +1445,7 @@
   paymentButton.disabled = true;
   paymentButton.textContent = currentLang === 'fr' ? 'Connexion sécurisée…' : 'Connecting securely…';
 
-  fetch('https://elite-driver-app1.vercel.app/api/create-checkout-session', {
+  fetch(paymentApiBase()+'/create-checkout-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -1410,7 +1453,14 @@
       service: pendingTrip.service,
       depart: pendingTrip.depart,
       arrivee: pendingTrip.arrivee,
-      vehicleType: pendingTrip.vehicleType
+      vehicleType: pendingTrip.vehicleType,
+      date: pendingTrip.date,
+      heure: pendingTrip.heure,
+      ref: pendingTrip.ref,
+      baseAmount: pendingTrip.baseAmount,
+      discountAmount: pendingTrip.discountAmount,
+      welcomeOffer: pendingTrip.welcomeOffer,
+      lang: currentLang
     })
   })
   .then(async response => {
