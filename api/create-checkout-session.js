@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
     return res.status(503).json({ error: 'Le paiement est momentanément indisponible. Veuillez nous contacter pour réserver.' });
   }
 
-  const { amount, service, depart, arrivee, vehicleType } = req.body || {};
+  const { amount, service, depart, arrivee, vehicleType, date, heure, ref, baseAmount, discountAmount, welcomeOffer, lang } = req.body || {};
   const basePrice = ROUTE_PRICES.get(depart + '|' + arrivee);
   const requestedAmount = Number(amount);
   const allowedAmounts = basePrice ? [basePrice, Math.round(basePrice * 0.85 * 100) / 100] : [];
@@ -34,6 +34,23 @@ module.exports = async (req, res) => {
   try {
     const stripe = stripePackage(secretKey);
     const vehicleDescription = vehicleType ? ' — ' + vehicleType : '';
+    const returnOrigin = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(req.headers.origin || '')
+      ? req.headers.origin
+      : APP_URL;
+    const tripMetadata = {
+      depart: String(depart),
+      arrivee: String(arrivee),
+      service: String(service || 'Transfert'),
+      vehicleType: String(vehicleType || ''),
+      date: String(date || ''),
+      heure: String(heure || ''),
+      amount: String(requestedAmount),
+      baseAmount: String(baseAmount || requestedAmount),
+      discountAmount: String(discountAmount || 0),
+      welcomeOffer: String(welcomeOffer === true),
+      ref: String(ref || ''),
+      lang: lang === 'en' ? 'en' : 'fr',
+    };
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -48,8 +65,11 @@ module.exports = async (req, res) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: APP_URL + '/?payment=success&session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: APP_URL + '/?payment=cancelled',
+      client_reference_id: tripMetadata.ref || undefined,
+      metadata: tripMetadata,
+      payment_intent_data: { metadata: tripMetadata },
+      success_url: returnOrigin + '/?payment=success&session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: returnOrigin + '/?payment=cancelled&session_id={CHECKOUT_SESSION_ID}',
     });
 
     return res.status(200).json({ url: session.url });
