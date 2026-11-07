@@ -736,24 +736,7 @@
           <p class="pay-summary-note" data-i18n="payDepositNote">Le solde sera réglé directement auprès de votre chauffeur.</p>
         </div>
 
-        <button class="apple-pay-btn" onclick="payNow()"><span>􀣺</span> <span data-i18n="applePayBtn">Payer avec Apple Pay</span></button>
-
-        <div class="pay-divider"><span data-i18n="orPayCard">ou par carte</span></div>
-
-        <div class="field">
-          <label data-i18n="lblCardName">Nom sur la carte</label>
-          <input type="text" id="p-name" data-i18n-ph="phCardName" placeholder="Jean Dupont">
-        </div>
-        <div class="field">
-          <label data-i18n="lblCardNumber">Numéro de carte</label>
-          <input type="text" id="p-number" inputmode="numeric" maxlength="19" placeholder="4242 4242 4242 4242" oninput="formatCardNumber(this)">
-        </div>
-        <div class="row2">
-          <div class="field"><label data-i18n="lblCardExpiry">Expiration</label><input type="text" id="p-expiry" placeholder="MM / AA" maxlength="7" oninput="formatExpiry(this)"></div>
-          <div class="field"><label data-i18n="lblCardCVC">CVC</label><input type="text" id="p-cvc" inputmode="numeric" maxlength="3" placeholder="123"></div>
-        </div>
-
-        <button class="btn" id="pay-card-btn" onclick="payNow()" data-i18n-amount="payBtn">Payer 45 €</button>
+        <button class="btn" id="pay-card-btn" onclick="payNow()" data-i18n-amount="payBtn">Continuer vers le paiement sécurisé</button>
         <button class="btn btn-ghost" style="margin-top:10px;" data-i18n="btnBackToForm" onclick="backToForm()">Modifier ma réservation</button>
       </div>
 
@@ -979,10 +962,10 @@
       confirmSub: "Nous revenons vers vous rapidement pour confirmer votre trajet.",
       tripDepart: "Départ", tripArrivee: "Arrivée", tripService: "Service", tripWhen: "Quand",
       refLabel: "Référence", backHome: "Retour à l'accueil",
-      paymentTitle: "Paiement de l'acompte",
-      paymentSub: "Un acompte sécurise votre réservation. Le solde est réglé au chauffeur.",
-      payDepositLabel: "Acompte à régler",
-      payDepositNote: "Le solde sera réglé directement auprès de votre chauffeur.",
+      paymentTitle: "Paiement sécurisé",
+      paymentSub: "Vous serez redirigé vers Stripe pour régler votre course.",
+      payDepositLabel: "Total de la course",
+      payDepositNote: "Paiement sécurisé par carte sur Stripe.",
       applePayBtn: "Payer avec Apple Pay",
       orPayCard: "ou par carte",
       lblCardName: "Nom sur la carte", phCardName: "Jean Dupont",
@@ -1102,10 +1085,10 @@
       confirmSub: "We'll get back to you shortly to confirm your ride.",
       tripDepart: "Pickup", tripArrivee: "Drop-off", tripService: "Service", tripWhen: "When",
       refLabel: "Reference", backHome: "Back to home",
-      paymentTitle: "Deposit payment",
-      paymentSub: "A deposit secures your booking. The remaining balance is paid to your driver.",
-      payDepositLabel: "Deposit due",
-      payDepositNote: "The remaining balance will be paid directly to your driver.",
+      paymentTitle: "Secure payment",
+      paymentSub: "You will be redirected to Stripe to pay for your ride.",
+      payDepositLabel: "Trip total",
+      payDepositNote: "Secure card payment through Stripe.",
       applePayBtn: "Pay with Apple Pay",
       orPayCard: "or pay by card",
       lblCardName: "Name on card", phCardName: "John Smith",
@@ -1307,27 +1290,70 @@
   function previousBookingStep(){setBookingStep(1);}
 
   let pendingTrip = null;
-  window.addEventListener('DOMContentLoaded', () => {
+  function paymentApiBase(){
+    return window.location.hostname.endsWith('.vercel.app')
+      ? window.location.origin + '/api'
+      : 'https://elite-driver-app1.vercel.app/api';
+  }
+
+  async function restoreTripFromCheckout(sessionId){
+    const response=await fetch(paymentApiBase()+'/verify-checkout-session?session_id='+encodeURIComponent(sessionId));
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.trip) throw new Error(data.error||'Impossible de vérifier le paiement.');
+    return data;
+  }
+
+  window.addEventListener('DOMContentLoaded', async () => {
     const dateInput=document.getElementById('f-date');
     if(dateInput) dateInput.min=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
     updateAirportRoute();
-    const params = new URLSearchParams(window.location.search);
-    if(params.get('payment') === 'success'){
-      const saved = localStorage.getItem('elitedriver_pending_trip');
-      const savedLang = localStorage.getItem('elitedriver_lang');
-      if(saved){
-        pendingTrip = JSON.parse(saved);
-        if(pendingTrip.welcomeOffer){
-          localStorage.setItem('elitedriver_welcome_offer_used','true');
-          const homeOffer=document.getElementById('home-welcome-offer');
-          if(homeOffer) homeOffer.hidden=true;
+
+    const params=new URLSearchParams(window.location.search);
+    const paymentStatus=params.get('payment');
+    const sessionId=params.get('session_id');
+    if((paymentStatus==='success'||paymentStatus==='cancelled')&&sessionId){
+      try{
+        const result=await restoreTripFromCheckout(sessionId);
+        const trip=result.trip;
+        pendingTrip={
+          nom:'',
+          depart:trip.depart,
+          arrivee:trip.arrivee,
+          date:trip.date,
+          heure:trip.heure,
+          service:trip.service,
+          vehicleType:trip.vehicleType,
+          amount:trip.amount,
+          baseAmount:trip.baseAmount,
+          discountAmount:trip.discountAmount,
+          welcomeOffer:trip.welcomeOffer,
+          ref:trip.ref
+        };
+        if(trip.lang) setLang(trip.lang);
+
+        if(paymentStatus==='success'&&result.paid){
+          if(pendingTrip.welcomeOffer){
+            localStorage.setItem('elitedriver_welcome_offer_used','true');
+            const homeOffer=document.getElementById('home-welcome-offer');
+            if(homeOffer) homeOffer.hidden=true;
+          }
+          goTo('reserver');
+          document.getElementById('booking-form-wrap').style.display='none';
+          showBookingConfirmation();
+          localStorage.removeItem('elitedriver_pending_trip');
+        }else{
+          document.getElementById('booking-title').textContent=translations[currentLang].paymentTitle;
+          document.getElementById('booking-sub').textContent=translations[currentLang].paymentSub;
+          document.getElementById('booking-form-wrap').style.display='none';
+          document.getElementById('booking-payment').style.display='block';
+          document.getElementById('pay-amount').textContent=Number(trip.amount).toLocaleString(currentLang==='fr'?'fr-FR':'en-GB',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+          goTo('reserver');
+          showToast(currentLang==='fr'?'Paiement annulé. Vous pouvez réessayer.':'Payment cancelled. You can try again.');
         }
-        if(savedLang) setLang(savedLang);
-        goTo('reserver');
-        document.getElementById('booking-form-wrap').style.display = 'none';
-        showBookingConfirmation();
-        localStorage.removeItem('elitedriver_pending_trip');
+      }catch(error){
+        showToast(error.message||'Impossible de vérifier le paiement.');
       }
+      window.history.replaceState({},'',window.location.pathname);
     }
   });
   function formatCardNumber(el){
@@ -1414,7 +1440,12 @@
   localStorage.setItem('elitedriver_pending_trip', JSON.stringify(pendingTrip));
   localStorage.setItem('elitedriver_lang', currentLang);
 
-  fetch('https://elite-driver1.vercel.app/api/create-checkout-session', {
+  const paymentButton = document.getElementById('pay-card-btn');
+  const defaultButtonText = paymentButton.textContent;
+  paymentButton.disabled = true;
+  paymentButton.textContent = currentLang === 'fr' ? 'Connexion sécurisée…' : 'Connecting securely…';
+
+  fetch(paymentApiBase()+'/create-checkout-session', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -1422,19 +1453,25 @@
       service: pendingTrip.service,
       depart: pendingTrip.depart,
       arrivee: pendingTrip.arrivee,
-      vehicleType: pendingTrip.vehicleType
+      vehicleType: pendingTrip.vehicleType,
+      date: pendingTrip.date,
+      heure: pendingTrip.heure,
+      ref: pendingTrip.ref,
+      baseAmount: pendingTrip.baseAmount,
+      discountAmount: pendingTrip.discountAmount,
+      welcomeOffer: pendingTrip.welcomeOffer,
+      lang: currentLang
     })
   })
-  .then(r => r.json())
-  .then(data => {
-    if(data.url){
-      window.location.href = data.url;
-    } else {
-      showToast('Erreur de paiement, réessayez');
-    }
+  .then(async response => {
+    const data = await response.json().catch(() => ({}));
+    if(!response.ok || !data.url) throw new Error(data.error || 'Le paiement n’a pas pu démarrer.');
+    window.location.href = data.url;
   })
-  .catch(() => {
-    showToast('Erreur de connexion au paiement');
+  .catch(error => {
+    showToast(error.message || 'Erreur de connexion au paiement');
+    paymentButton.disabled = false;
+    paymentButton.textContent = defaultButtonText;
   });
 }
   function showBookingConfirmation(){
