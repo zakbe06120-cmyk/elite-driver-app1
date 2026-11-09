@@ -604,7 +604,7 @@
         </div>
         <button class="btn" data-i18n="heroBtn" onclick="planAirportTransfer()">Planifier mon trajet <span aria-hidden="true">→</span></button>
         <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" onclick="toggleWelcomeMusic()"><span aria-hidden="true">♫</span><span data-i18n="musicPlay">Écouter la musique</span></button>
-        <audio id="welcome-music" src="ambiance-elite-driver-originale.wav" loop preload="none"></audio>
+        <audio id="welcome-music" src="ambiance-elite-driver-originale.wav" loop preload="auto" playsinline></audio>
       </div>
 
       <div class="strip">
@@ -1307,6 +1307,13 @@
     const dateInput=document.getElementById('f-date');
     if(dateInput) dateInput.min=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
     updateAirportRoute();
+    const welcomeMusic=document.getElementById("welcome-music");
+    if(welcomeMusic){
+      welcomeMusic.preload="auto";
+      welcomeMusic.load();
+      welcomeMusic.addEventListener("play",updateMusicButton);
+      welcomeMusic.addEventListener("pause",updateMusicButton);
+    }
 
     const params=new URLSearchParams(window.location.search);
     const paymentStatus=params.get('payment');
