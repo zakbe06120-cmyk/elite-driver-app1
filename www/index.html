@@ -541,10 +541,10 @@
 }
 
 /* Accueil : contrôle audio et badge promotionnel compact */
-.music-toggle{display:flex;align-items:center;justify-content:center;gap:7px;margin:9px auto 0;padding:6px 11px;border:1px solid rgba(255,255,255,.34);border-radius:99px;background:rgba(10,30,40,.26);color:#fffdf8;font:500 10.5px 'Poppins',sans-serif;cursor:pointer;}
-  .music-toggle span:first-child{font-size:14px;color:#f2b09a;}
-  .music-toggle[aria-pressed="true"]{background:rgba(255,255,255,.18);}
-  .music-toggle:focus-visible{outline:2px solid #f2b09a;outline-offset:3px;}
+
+
+
+
   .hero-promo{gap:7px;margin:0 0 12px;padding:4px 8px;border:1px solid rgba(255,255,255,.2);border-radius:99px;background:rgba(255,255,255,.1);width:max-content;backdrop-filter:blur(6px);}
   .hero-promo-rate{display:inline-grid;place-items:center;width:auto;height:auto;padding:3px 6px;border-radius:99px;background:linear-gradient(145deg,#f1ae96,#d97757);color:#192d37;font:700 9px 'Poppins',sans-serif;}
   .hero-promo-copy{font-size:9px;color:rgba(255,253,248,.82);}
@@ -602,8 +602,8 @@
           <span class="hero-promo-rate">−15 %</span>
           <span class="hero-promo-copy" data-i18n="homeOfferTiny">sur votre première réservation</span>
         </div>
-        <button class="btn" data-i18n="heroBtn" onclick="planAirportTransfer()">Planifier mon trajet <span aria-hidden="true">→</span></button>
-        <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" onclick="toggleWelcomeMusic()"><span aria-hidden="true">♫</span><span data-i18n="musicPlay">Écouter la musique</span></button>
+        <button class="btn" data-i18n="heroBtn" onclick="planAirportTransfer(true)">Planifier mon trajet <span aria-hidden="true">→</span></button>
+
         <audio id="welcome-music" src="ambiance-elite-driver-originale.wav" loop preload="auto" playsinline></audio>
       </div>
 
@@ -1240,7 +1240,7 @@
   }
 
   function updateMusicButton(){
-    const button=document.getElementById('music-toggle');
+
     const audio=document.getElementById('welcome-music');
     if(!button||!audio) return;
     button.setAttribute('aria-pressed',String(!audio.paused));
@@ -1255,7 +1255,7 @@
     updateMusicButton();
   }
 
-  function planAirportTransfer(){
+  function planAirportTransfer(startWelcomeMusic=false){if(startWelcomeMusic){const audio=document.getElementById('welcome-music');if(audio&&audio.paused)audio.play().catch(()=>{});}
     const origin=document.getElementById('f-depart');
     if(origin) origin.value='';
     document.getElementById('f-depart-other').value='';
