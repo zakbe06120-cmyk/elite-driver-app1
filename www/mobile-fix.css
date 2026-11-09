@@ -1,0 +1,23 @@
+html,body{width:100%;min-width:0;margin:0;padding:0;overflow-x:hidden;}
+@media(max-width:767px){
+html,body{width:100%;min-width:0;overflow-x:hidden;}
+.statusbar{display:none;}
+.device{width:100%;max-width:100%;min-height:100vh;min-height:100dvh;height:auto;max-height:none;padding-top:env(safe-area-inset-top,0px);border:0;border-radius:0;box-shadow:none;overflow-x:hidden;}
+.app-header{min-width:0;padding-left:clamp(12px,4vw,18px);padding-right:clamp(12px,4vw,18px);}
+.brand{font-size:clamp(11px,3.2vw,14px);letter-spacing:.04em;line-height:1.2;overflow-wrap:anywhere;}
+.header-right{gap:4px;}
+.lang-btn{padding-left:6px;padding-right:6px;}
+.badge-24{padding-left:6px;padding-right:6px;font-size:9px;}
+.content{width:100%;min-width:0;padding-left:clamp(14px,5vw,20px);padding-right:clamp(14px,5vw,20px);padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));}
+.screen{width:100%;min-width:0;}
+.screen-title{font-size:clamp(21px,6.1vw,27px);line-height:1.2;overflow-wrap:anywhere;}
+.pay-summary{width:100%;min-width:0;padding:clamp(12px,4vw,16px);}
+.pay-summary-row{min-width:0;gap:8px;}
+.pay-summary-row>:first-child{min-width:0;flex:1 1 auto;}
+.pay-summary-row>:last-child{flex:0 1 auto;text-align:right;white-space:nowrap;}
+.pay-amount{font-size:clamp(18px,5.3vw,22px);}
+.apple-pay-btn{min-width:0;padding-left:10px;padding-right:10px;font-size:clamp(13px,4vw,15px);}
+.tabbar{left:0;right:0;width:100%;padding-left:2px;padding-right:2px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));}
+.tab{min-width:0;font-size:clamp(8px,2.4vw,10px);}
+.tab span{white-space:nowrap;}
+}
