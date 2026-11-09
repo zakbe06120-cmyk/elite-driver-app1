@@ -1,5 +1,6 @@
 html,body{width:100%;min-width:0;margin:0;padding:0;overflow-x:hidden;}
 @media(max-width:767px){
+body{display:block;padding:0;min-height:100vh;min-height:100dvh;background:var(--sand);}
 html,body{width:100%;min-width:0;overflow-x:hidden;}
 .statusbar{display:none;}
 .device{width:100%;max-width:100%;min-height:100vh;min-height:100dvh;height:auto;max-height:none;padding-top:env(safe-area-inset-top,0px);border:0;border-radius:0;box-shadow:none;overflow-x:hidden;}
